@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratado Técnico: XAI Axiomático, Simulador Contrafactual e IDV — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Tratados Técnicos Aprofundados</span>
+    </div>
+    <h1>Tratado Técnico: Inteligência Artificial Explicável (XAI), Simulador Contrafactual e o Índice de Divergência de Vigilância (IDV)</h1>
+    <p>Fundamentação matemática na Teoria dos Jogos Cooperativos (Lloyd Shapley), algoritmos TreeSHAP (Scott Lundberg), curvas ICE/PDP e formulação dos produtos de impacto para o SUS e Ministério Público.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Teoria dos Jogos Cooperativos e os Quatro Axiomas de Shapley</h2>
+      <p>Em saúde pública e disputas judiciais de responsabilidade civil ambiental, a explicabilidade de um modelo de inteligência artificial não pode ser uma aproximação heurística arbitrária. Ela exige <strong>respaldo axiomático irrefutável</strong>.</p>
+
+      <p>Em 1953, o matemático <strong>Lloyd Shapley</strong> (Prêmio Nobel de Economia de 2012) formulou o método canônico para distribuir os ganhos (ou penalidades) totais de uma coalizão entre jogadores cooperativos. Adaptado para Machine Learning por <strong>Scott Lundberg e Su-In Lee (NeurIPS 2017)</strong>, cada variável de poluição atua como um "jogador" e a taxa predita de mortalidade por câncer representa o "ganho da coalizão".</p>
+
+      <h3>Os Quatro Axiomas Clássicos de Shapley</h3>
+      <p>O Teorema de Shapley prova que existe <strong>uma única atribuição de importância $\phi_j$</strong> que satisfaz simultaneamente quatro axiomas:</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">1. Axioma da Eficiência (Efficiency)</div>
+        <p>$$f(x) = \phi_0 + \sum_{j=1}^M \phi_j(x)$$</p>
+        <p>A soma da contribuição atribuída a cada poluente $\phi_j$ somada à taxa média nacional basal $\phi_0 = \mathbb{E}[f(X)]$ equivale exatamente à taxa total predita $f(x)$ para o município. Não há superestimação, subestimação nem criação de taxas artificiais.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">2. Axioma da Simetria (Symmetry)</div>
+        <p>Se dois contaminantes químicos $j$ e $k$ contribuem com o mesmo acréscimo marginal para todas as possíveis coalizões de poluentes $S \subseteq F \setminus \{j, k\}$:
+        $$f(S \cup \{j\}) = f(S \cup \{k\}), \quad \text{então } \phi_j = \phi_k$$
+        Variáveis com o mesmo impacto biológico recebem rigorosamente o mesmo valor explicativo.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">3. Axioma do Jogador Nulo (Dummy / Null Player)</div>
+        <p>Se um atributo $j$ não altera a taxa predita de câncer quando adicionado a qualquer coalizão de contaminantes ($f(S \cup \{j\}) = f(S)$), então seu valor SHAP é estritamente zero: $\phi_j = 0$. Variáveis irrelevantes não recebem crédito espúrio.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">4. Axioma da Aditividade (Additivity)</div>
+        <p>Se um modelo é composto pela soma de dois processos independentes $f = f_1 + f_2$, a importância total é a soma das importâncias parciais: $\phi_j(f_1 + f_2) = \phi_j(f_1) + \phi_j(f_2)$. Permite decompor o efeito de múltiplos tumores somados.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Por Que a Métrica de Impureza de Gini é Inválida? (Lundberg et al., Nature 2020)</h2>
+      <p>Em árvores de decisão e Random Forests, a métrica padrão comumente reportada é o <em>Gini Gain</em> (redução média de impureza proporcionada por divisões na coluna $j$).</p>
+      
+      <p>No artigo clássico publicado na <em>Nature Machine Intelligence (2020)</em>, <strong>Scott Lundberg et al.</strong> provaram formalmente que métricas baseadas em impureza de Gini e contagem de divisões são <strong>inconsistentes</strong>:</p>
+      <ul>
+        <li>Se você modificar um modelo para que ele dê mais peso real a uma variável $X_1$, a métrica de Gini pode paradoxalmente <strong>reduzir</strong> a importância atribuída a $X_1$!</li>
+        <li>O ganho de Gini favorece sistematicamente variáveis contínuas com alta variabilidade ou alta cardinalidade, atribuindo falsa relevância a colunas ruidosas.</li>
+      </ul>
+
+      <h3>O Algoritmo TreeSHAP</h3>
+      <p>Calcular valores exatos de Shapley para modelos gerais é um problema NP-difícil que exige avaliar $2^M$ combinações de variáveis. Para viabilizar a auditoria de todos os 5.570 municípios do Brasil, Lundberg desenvolveu o <strong>TreeSHAP</strong>: um algoritmo baseado em programação dinâmica que percorre recursivamente a estrutura de nós das árvores, reduzindo a complexidade de tempo de exponencial para polinomial:</p>
+      $$\text{Complexidade TreeSHAP} = O(T \cdot L \cdot D^2)$$
+      <p>Onde $T$ é o número de árvores no ensemble, $L$ é o número máximo de folhas e $D$ é a profundidade máxima. O que antes levaria dias em um supercomputador é computado em <strong>segundos</strong> em uma máquina local!</p>
+    </section>
+
+    <section>
+      <h2>3. Curvas Dose-Resposta: PDP, ICE e o Limiar Crítico ($\text{SHAP} = 0$)</h2>
+      <p>No manual <em>Interpretable Machine Learning</em>, <strong>Christoph Molnar</strong> sistematiza a extração de curvas de dose-resposta em modelos agnósticos:</p>
+
+      <h3>Partial Dependence Plots (PDP)</h3>
+      <p>A função de dependência parcial para o vetor de poluição $x_S$ marginaliza o efeito de todas as demais covariáveis $x_C$:</p>
+      $$\hat{f}_{x_S}(x_S) = \mathbb{E}_{X_C}[\hat{f}(x_S, X_C)] = \frac{1}{n} \sum_{i=1}^n \hat{f}(x_S, x_{C,i})$$
+      <p>O PDP fornece a curva média nacional: como a mortalidade por câncer se comporta à medida que o volume médio de glifosato ou trihalometanos sobe de 0 a 15 L/ha.</p>
+
+      <h3>Individual Conditional Expectation (ICE)</h3>
+      <p>Enquanto o PDP calcula a média, as curvas ICE traçam a curva predita para <strong>cada município individualmente</strong>:</p>
+      $$\hat{f}^{(i)}_{x_S}(x_S) = \hat{f}(x_S, x_{C,i})$$
+      <p>Se todas as curvas ICE forem paralelas, o efeito é homogêneo. Se as curvas se abrirem em leque, revelam <strong>heterogeneidade de efeito (CATE)</strong>: municípios com déficit grave de saneamento e desnutrição sofrem uma aceleração do câncer muito mais rápida sob a mesma dosagem de pesticida do que municípios ricos.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">O Limiar Crítico de Transição (Ponto SHAP = 0)</div>
+        <p>Ao plotar a curva dose-resposta dos valores SHAP em função da concentração de um contaminante, define-se o <strong>Limiar Crítico ($\text{SHAP} = 0$)</strong>. Abaixo desse ponto, a carga química está dentro da faixa de depuração do organismo e não adiciona risco. A partir do momento em que a curva cruza a linha de zero e torna-se estritamente positiva, a exposição passa a matar. Esse valor matemático fornece à ANVISA e ao IBAMA o parâmetro probatório exato para definir limites legais de segurança.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Produto I: O Simulador Contrafactual de Vidas Salvas para Gestores do SUS</h2>
+      <p>O Simulador Contrafactual traduz as derivadas parciais do Double Machine Learning e do TabFM em uma ferramenta computacional parametrizada no BigQuery e no front-end web:</p>
+
+      <h3>A Formulação Matemática do Contrafactual</h3>
+      <p>Para cada município $i$, a taxa de mortalidade esperada contrafactual $\hat{Y}_i^{\text{CF}}$ sob uma intervenção regulatória que reduza a exposição de $D_i$ para $D_i^*$ é obtida por:</p>
+      $$\hat{Y}_i^{\text{CF}} = \hat{Y}_i^{\text{Observada}} - \hat{\theta}_{\text{DML}} \cdot \max(0, D_i - D_i^*)$$
+      <p>O número de <strong>Óbitos por Câncer Evitados por Década</strong> no município $i$ ($\Delta \text{Vidas}_i$) é calculado multiplicando a redução da taxa pela população média exposta ao longo de 10 anos:</p>
+      $$\Delta \text{Vidas}_i = \left( \frac{\hat{Y}_i^{\text{Observada}} - \hat{Y}_i^{\text{CF}}}{100.000} \right) \times P_i \times 10$$
+
+      <h3>Os Três Cenários Regulatórios Parametrizados</h3>
+      <ol>
+        <li><strong>Cenário A (Zonas de Amortecimento de 300 Metros):</strong> Modela a imposição de um cordão sanitário sem pulverização ao redor do perímetro urbano, escolas e mananciais, zerando a fração de deriva residencial calculada pelo MapBiomas.</li>
+        <li><strong>Cenário B (Descontaminação Hídrica GM/MS nº 888/2021):</strong> Trunca todos os laudos do SISAGUA para o Valor Máximo Permitido (VMP), eliminando as excedências de trihalometanos e agrotóxicos na rede pública de água.</li>
+        <li><strong>Cenário C (Transição Energética e Filtros Industriais):</strong> Reduz em 1 Intervalo Interquartil (IQR) a concentração de $\text{PM}_{2.5}$ através da desativação ou filtragem de emissões industriais e queimadas.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>5. Produto II: O Índice de Divergência de Vigilância (IDV) para o Ministério Público</h2>
+      <p>A vigilância passiva do SUS (SINAN) sofre de subnotificação massiva no registro de agravos relacionados ao trabalho e aos agrotóxicos. O <code>onco-causal</code> inverte esse paradigma, criando um sistema de <strong>Vigilância Ativa Orientada por Algoritmo</strong>.</p>
+
+      <h3>A Equação do IDV</h3>
+      $$\text{IDV}_i = \frac{\hat{Y}_i^{\text{Físico-Química Predita}}}{\text{Notificação Oficial no SINAN}_i + \varepsilon}$$
+      <p>Onde:</p>
+      <ul>
+        <li>$\hat{Y}_i^{\text{Físico-Química Predita}}$ é a taxa de adoecimento oncológico e intoxicação crônica esperada exclusivamente a partir da assinatura objetiva do município: hectares de lavoura, toneladas de ingredientes ativos, contaminação do SISAGUA, $\text{PM}_{2.5}$ e trabalhadores na LINACH.</li>
+        <li>$\text{Notificação Oficial no SINAN}_i$ é a taxa histórica registrada nas fichas de notificação compulsória do SUS.</li>
+        <li>$\varepsilon$ é uma constante de suavização infinitesimal para evitar divisão por zero em municípios omissos.</li>
+      </ul>
+
+      <h3>Interpretação e Uso pelas Autoridades</h3>
+      <ul>
+        <li>$\text{IDV}_i \approx 1$: Vigilância em Saúde calibrada. O município notifica proporcionalmente ao seu risco real.</li>
+        <li>$\text{IDV}_i \gg 1$ (ex.: $\text{IDV} > 50$): <strong>Silent Hotspot (Zona de Sacrifício Oculta)</strong>. O modelo aponta que dezenas de trabalhadores e moradores estão adoecendo por causas químicas, mas o sistema de saúde municipal registra zero casos por conivência política local ou falta de capacitação médica.</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Instrumento Probatório para o Ministério Público do Trabalho (MPT) e CEREST</div>
+        <p>O mapa do IDV fornece aos procuradores do Ministério Público alvos territoriais precisos para instaurar Inquéritos Civis Públicos (ICPs), autuar cooperativas e indústrias poluidoras e exigir a realização de exames toxicológicos e busca ativa de câncer ocupacional pela rede CEREST/RENAST.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Tratados de Engenharia e Ciência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

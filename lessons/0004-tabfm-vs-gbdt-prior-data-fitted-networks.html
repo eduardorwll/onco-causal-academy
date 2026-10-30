@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0004: TabFM, TabPFN e o Debate dos Modelos Tabulares</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0004</span>
+    </div>
+    <span class="badge">Módulo 4: Machine Learning Tabular</span>
+    <h1>Lição 0004: Modelos de Fundação Tabulares (TabFM/TabPFN) vs. GBDTs</h1>
+    <p>Entenda o paradigma das Prior-Data Fitted Networks de Frank Hutter, a força dos baselines de XGBoost e o papel dos Fourier Cell Embeddings.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. A Fronteira do Machine Learning Tabular</h2>
+      <p>Em processamento de linguagem natural e visão computacional, os modelos de fundação (Transformers) tornaram-se hegemônicos. No entanto, em dados tabulares estruturados (como tabelas municipais com colunas de agroquímicos, leitos e saneamento), os modelos baseados em árvores (<strong>Gradient Boosted Decision Trees — GBDTs</strong>: XGBoost, LightGBM, CatBoost) dominaram o estado da arte por mais de duas décadas.</p>
+      
+      <p>O estudo seminal de <strong>Grinsztajn, Oyallon & Varoquaux (NeurIPS, 2022)</strong> provou por que GBDTs continuam tão fortes em dados tabulares:</p>
+      <ul>
+        <li><strong>Bordas de decisão não suaves:</strong> Árvores lidam nativamente com funções em degrau (ex.: limiares toxicológicos de corte legal de contaminação hídrica).</li>
+        <li><strong>Invariância a transformações monotônicas:</strong> GBDTs não são afetados por distribuições com caudas pesadas ou valores em escala logarítmica.</li>
+        <li><strong>Imunidade a atributos irrelevantes:</strong> Árvores simplesmente não dividem nós em colunas de ruído.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. A Revolução do TabFM e TabPFN (Frank Hutter et al.)</h2>
+
+      <h3>O Que São Prior-Data Fitted Networks (PFNs)?</h3>
+      <p>Criadas pelo grupo de Frank Hutter (Universidade de Freiburg / Bosch Center for AI), as <strong>PFNs</strong> mudaram radicalmente o paradigma do Deep Learning em tabelas:</p>
+      <ul>
+        <li>A rede neural Transformer <strong>não</strong> aprende ajustando pesos via gradiente descendente nos dados do seu problema!</li>
+        <li>Ela é pré-treinada offline durante semanas em milhões de conjuntos de dados sintéticos gerados por <strong>Modelos Causais Estruturais (SCMs)</strong> e processos gaussianos.</li>
+        <li>Durante o pré-treinamento, a rede aprende a aproximar a <strong>Inferência Bayesiana completa</strong> (a distribuição a posteriori preditiva $p(y \mid x, \mathcal{D}_{\text{treino}})$).</li>
+      </ul>
+
+      <h3>Aprendizagem em Contexto (In-Context Learning Tabular)</h3>
+      <p>No momento de prever o risco oncológico em novos municípios, o conjunto de dados históricos dos municípios entra diretamente como tokens de contexto (support set). A previsão para o novo município é gerada em <strong>uma única passagem direta (single forward pass)</strong> em frações de segundo, sem necessidade de re-treinamento ou backpropagation!</p>
+
+      <h3>Learned Fourier Cell Embeddings</h3>
+      <p>Como representar números contínuos (litros de pesticida por hectare ou microgramas de particulado) dentro de um Transformer? O TabFM utiliza <strong>Fourier Cell Embeddings</strong>: cada célula numérica é projetada em combinações harmônicas de frequências senoidais e cossenoidais parametrizadas, permitindo que as 24 camadas de atenção aprendam interações não-lineares complexas entre diferentes contaminantes.</p>
+
+      <div class="pitch-box">
+        <div class="pitch-title">🎙️ Resposta de 30 Segundos para a Banca</div>
+        <p>"Nós não descartamos os GBDTs. Respeitando o estudo clássico de Grinsztajn et al. no NeurIPS, mantemos XGBoost, LightGBM e CatBoost como nossos baselines estritos. O TabFM é nosso modelo pioneiro de fundação tabular (Hutter et al.): pré-treinado em grafos causais sintéticos, ele faz inferência Bayesiana em contexto sem gradiente descendente, oferecendo generalização superior fora da amostra sob bloqueio espacial de bacias hidrográficas."</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. Como uma rede do tipo Prior-Data Fitted Network (TabPFN/TabFM) aprende as relações preditivas do conjunto de dados?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. PFNs não usam retropropagação de erro no momento de teste.')">
+            Ajustando os pesos das camadas ocultas através de backpropagation repetido nos dados municipais.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Perfeito! Inferência Bayesiana em contexto em uma única passagem direta.', '')">
+            Empregando inferência em contexto em uma única passagem direta, condicionada aos dados de suporte.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. PFNs não realizam agrupamento não supervisionado K-means.')">
+            Criando clusters espaciais não supervisionados que agrupam municípios por contiguidade territorial.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recursos Primários Recomendados</h2>
+      <p>Leia o artigo <a href="https://arxiv.org/abs/2207.08815" target="_blank">Grinsztajn et al. (NeurIPS 2022)</a> sobre a superioridade de árvores e o paper clássico <a href="https://arxiv.org/abs/2207.01848" target="_blank">TabPFN (Hollmann et al., 2023)</a>.</p>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <a href="0003-epidemiologia-espacial-e-bayesian-smoothing.html">← Lição 0003 (Espacial & PySAL)</a>
+    <a href="0005-estado-da-arte-agrotoxicos-e-cancer.html">Próxima: Lição 0005 (Estado da Arte de Agrotóxicos) →</a>
+  </footer>
+
+</body>
+</html>

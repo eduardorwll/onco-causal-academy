@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0003: Epidemiologia Espacial e Suavização Bayesiana Empírica</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0003</span>
+    </div>
+    <span class="badge">Módulo 3: Geoespacial & Pequenas Áreas</span>
+    <h1>Lição 0003: O Problema dos Pequenos Números e a Suavização Bayesiana com PySAL</h1>
+    <p>Aprenda por que taxas brutas distorcem a epidemiologia em pequenas cidades e como aplicar Spatial Empirical Bayes (k=31) e Spatial Block Cross-Validation.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. A Falácia dos Pequenos Denominadores</h2>
+      <p>No Brasil, mais de 70% dos municípios têm menos de 20.000 habitantes. Em um município pequeno com 4.000 habitantes:</p>
+      <ul>
+        <li>Se ocorrer <strong>1 único óbito</strong> esporádico por câncer, a taxa bruta salta para <strong>25 por 100 mil</strong>.</li>
+        <li>Se ocorrer <strong>0 óbito</strong>, a taxa bruta despenca para <strong>0 por 100 mil</strong>, sugerindo um falso "paraíso livre de câncer".</li>
+      </ul>
+      <p>A variância de uma taxa bruta é inversamente proporcional à população: $\text{Var}(r_i) \approx \frac{\lambda_i}{P_i}$. Cidades pequenas geram uma instabilidade estatística que engana qualquer algoritmo de Machine Learning. Por isso, <strong>o onco-causal proíbe taxas brutas como desfecho $Y$</strong>.</p>
+    </section>
+
+    <section>
+      <h2>2. A Solução Canônica: Waller & Gotway e Luc Anselin</h2>
+
+      <h3>A. Padronização Etária Direta ($\text{ASR}$) e Indireta ($\text{SMR}$)</h3>
+      <p>Primeiro, padronizamos a taxa etária pela população padrão mundial da OMS por faixas etárias de 5 anos (de 0 a 80+ anos). Isso elimina o viés de idade (cidades com população mais idosa teriam mais óbitos naturais mesmo sem poluição).</p>
+
+      <h3>B. Spatial Linear Empirical Bayes (PySAL, $k=31$ Vizinhos)</h3>
+      <p>Em seguida, aplicamos a suavização Bayesiana Empírica Espacial Linear do PySAL. A fórmula canônica de encolhimento (<em>shrinkage</em>) é:</p>
+      $$\hat{Y}_i^{\text{EB}} = w_i \cdot r_i + (1 - w_i) \cdot \mu_{\text{local}}$$
+      <p>Onde o fator de ponderação $w_i \in [0, 1]$ equilibra a taxa do próprio município $r_i$ e a média da sua vizinhança $\mu_{\text{local}}$:</p>
+      $$w_i = \frac{\sigma^2}{\sigma^2 + \frac{\mu}{P_i}}$$
+      <ul>
+        <li>Em grandes centros urbanos ($P_i > 100.000$), $w_i \to 1$: o modelo confia no dado observado local porque a amostra é estável.</li>
+        <li>Em pequenas cidades rurais ($P_i < 5.000$), $w_i \to 0$: o estimador encolhe a taxa instável em direção ao prior regional, eliminando o ruído artificial sem apagar os polos agrícolas reais.</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">A Regra da Dupla Malha Territorial</div>
+        <p>A matriz de $k=31$ vizinhos e a suavização Bayesiana ocorrem <strong>obrigatoriamente na malha nacional integral de 5.570 municípios</strong>. O filtro para o recorte analítico (&gt;50k hab. e polos de agronegócio) só é aplicado <em>depois</em> da suavização, garantindo que não ocorra efeito de borda na fronteira dos municípios vizinhos.</p>
+      </div>
+
+      <h3>C. Validação Anti-Vazamento: Nested Spatial Block CV (Roberts et al., 2017)</h3>
+      <p>A Lei de Tobler diz que <em>"todas as coisas se relacionam, mas coisas próximas se relacionam mais do que coisas distantes"</em>. Se você usar <code>train_test_split</code> aleatório do scikit-learn, municípios vizinhos cairão simultaneamente no treino e no teste. O modelo apenas "cola" do vizinho e atinge um falso $R^2$ alto por <strong>Spatial Data Leakage</strong>.</p>
+      <p>Para impedir isso, agrupamos os dados em blocos espaciais disjuntos de <strong>Ottobacias hidrográficas da ANA</strong> em projeção cartográfica de área equivalente (<code>SIRGAS 2000 Albers / EPSG:5070</code>). O modelo é treinado em bacias do Sul e testado em bacias do Centro-Oeste que ele nunca viu!</p>
+
+      <div class="pitch-box">
+        <div class="pitch-title">🎙️ Resposta de 30 Segundos para a Banca</div>
+        <p>"Mais de 70% dos municípios têm populações pequenas onde um único óbito distorce a taxa bruta. Seguindo Waller & Gotway e Anselin, nós padronizamos pela população mundial da OMS e aplicamos Spatial Empirical Bayes com k=31 vizinhos na malha nacional de 5.570 municípios. Para avaliar os modelos, proibimos splits aleatórios e usamos validação cruzada aninhada em blocos de bacias hidrográficas da ANA, eliminando qualquer vazamento espacial."</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. O que acontece com o peso de encolhimento $w_i$ da Suavização Bayesiana Empírica quando a população do município $P_i$ é muito grande?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. Em grandes cidades a taxa é confiável e não deve ser substituída pela vizinhança.')">
+            O peso aproxima-se de zero, forçando a cidade a adotar a média da sua vizinhança.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Correto! O peso vai para 1, preservando a taxa observada real da cidade.', '')">
+            O peso aproxima-se de um, preservando a taxa observada real daquela cidade estável.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. A variância não se torna infinita.')">
+            O peso torna-se indeterminado porque a variância observada tende ao infinito.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recurso Primário Recomendado</h2>
+      <p>Consulte os Capítulos 4 e 6 do livro aberto <a href="https://geographicdata.science/book/" target="_blank">Geographic Data Science with Python</a> (Sergio Rey et al.) para visualizar matrizes de pesos espaciais no PySAL.</p>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <a href="0002-inferencia-causal-e-double-ml.html">← Lição 0002 (Causalidade & DML)</a>
+    <a href="0004-tabfm-vs-gbdt-prior-data-fitted-networks.html">Próxima: Lição 0004 (TabFM vs GBDT) →</a>
+  </footer>
+
+</body>
+</html>

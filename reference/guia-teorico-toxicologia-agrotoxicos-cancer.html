@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratado Técnico: Toxicologia, Vetores de Exposição e Latência — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Tratados Técnicos Aprofundados</span>
+    </div>
+    <h1>Tratado Técnico: Fisiopatologia da Carcinogênese, Quatro Vetores de Exposição e Sincronização Bio-Temporal</h1>
+    <p>Fundamentação mecanística molecular, toxicológica e sanitária baseada nas diretrizes da IARC/OMS, Portaria GM/MS nº 888/2021, LINACH e literatura epidemiológica brasileira.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. A História Natural da Carcinogênese e o Desalinhamento Temporal</h2>
+      <p>A transformação de uma célula normal em uma neoplasia invasora maligna não ocorre de forma instantânea. O modelo da IARC (Agência Internacional de Pesquisa em Câncer da OMS) divide o processo em três fases mecanísticas:</p>
+      
+      <ol>
+        <li><strong>Iniciação:</strong> Dano irreversível ao DNA celular causado por agentes genotóxicos (ex.: quebras cromossômicas induzidas por benzeno, adutos de DNA por agrotóxicos organofosforados ou metabólitos reativos de trihalometanos).</li>
+        <li><strong>Promoção:</strong> Expansão clonal seletiva de células iniciadas estimulada por exposição crônica a promotores não-mutagênicos e desreguladores endócrinos (ex.: atrazina, glifosato, $\text{PM}_{2.5}$, hipóxia induzida por metais pesados e citocinas inflamatórias).</li>
+        <li><strong>Progressão:</strong> Aquisição de instabilidade genômica, angiogênese tumoral, invasão tecidual e capacidade metastática.</li>
+      </ol>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">O Erro Fatal dos Estudos Ecológicos Anteriores (Cegueira Temporal)</div>
+        <p>Quase toda a literatura ecológica prévia no Brasil cruzou a venda de agrotóxicos ou a poluição do ar do ano $t$ com os óbitos por câncer do mesmo ano $t$. Isso é uma aberração biológica: <em>o agrotóxico pulverizado hoje em uma lavoura de soja não mata de adenocarcinoma gástrico amanhã</em>. Esse erro dilui o sinal estatístico real e pode induzir causalidade reversa.</p>
+      </div>
+
+      <h3>A Bifurcação Parametrizada de Lags no onco-causal</h3>
+      <p>O <code>onco-causal</code> quebra a cegueira temporal impondo defasagens retrospectivas rígidas fundamentadas na histopatologia:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Subgrupo Topográfico (CID-10)</th>
+            <th>Janela de Latência Parametrizada</th>
+            <th>Justificativa Fisiopatológica e Biomecânica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Neoplasias Hematológicas (`C81–C96`) e Infantojuvenis (0 a 19 anos)</strong></td>
+            <td><strong>$t-2$ a $t-5$ anos</strong></td>
+            <td>Tecidos hematopoiéticos possuem altíssima taxa de renovação celular e vulnerabilidade mitótica. Exposições intrauterinas e na primeira infância a solventes e pesticidas precipitam leucemias agudas (LLA e LMA) e linfomas em curtíssimo prazo (Ferreira et al., 2013; Curvo et al., 2013).</td>
+          </tr>
+          <tr>
+            <td><strong>Neoplasias do Trato Respiratório (`C34` — Traqueia, Brônquios e Pulmão)</strong></td>
+            <td><strong>$t-10$ a $t-25$ anos</strong></td>
+            <td>Inalação crônica de $\text{PM}_{2.5}$, sílica cristalina, amianto e hidrocarbonetos aromáticos policíclicos (HAP). A gênese de adenocarcinomas e carcinomas espinocelulares pulmonares exige décadas de acúmulo de mutações em oncogenes como KRAS e EGFR.</td>
+          </tr>
+          <tr>
+            <td><strong>Neoplasias do Aparelho Digestivo (`C15–C26` — Esôfago, Estômago, Cólon)</strong></td>
+            <td><strong>$t-10$ a $t-25$ anos</strong></td>
+            <td>Ingestão crônica de água contaminada por subprodutos da cloração (trihalometanos), metais pesados (arsênio, cádmio) e agrotóxicos lixiviados. A transição metaplasia $\to$ displasia $\to$ adenocarcinoma gástrico/colorretal leva de 15 a 30 anos.</td>
+          </tr>
+          <tr>
+            <td><strong>Neoplasias Hormoniodependentes (`C50` Mama, `C53` Colo, `C61` Próstata)</strong></td>
+            <td><strong>$t-10$ a $t-20$ anos</strong></td>
+            <td>Ação cumulativa de desreguladores endócrinos (xenoestrogênios agrícolas) que desregulam receptores hormonais e vias proliferativas de tecido glandular mamário e prostático (Panis et al., 2022; Dutra et al., 2020).</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>2. O Vetor Agroquímico e Uso da Terra (Método de Pignati & MapBiomas)</h2>
+      <p>Como não existe no Brasil um sistema público obrigatório de receita agronômica georreferenciada por fazenda (diferente da Califórnia), o <code>onco-causal</code> reconstrói a carga química municipal aprimorando o método do Prof. Wanderlei Pignati (UFMT):</p>
+
+      <h3>A Equação de Estimativa Municipal de Consumo</h3>
+      $$\text{Agroquímico}_i(t) = \sum_{c \in \text{Culturas}} \text{ÁreaPlantada}_{i,c}(t) \times \beta_c$$
+      <p>Onde:</p>
+      <ul>
+        <li>$\text{ÁreaPlantada}_{i,c}(t)$ é extraída da Pesquisa Agrícola Municipal (PAM/IBGE) para as seis culturas hiperintensivas em defensivos: soja, milho safrinha, algodão herbáceo, cana-de-açúcar, arroz irrigado e citros.</li>
+        <li>$\beta_c$ são os coeficientes técnicos médios de litros/quilogramas de ingrediente ativo por hectare, calibrados a partir dos relatórios anuais de comercialização do IBAMA e auditorias do Ministério da Agricultura.</li>
+      </ul>
+
+      <h3>A Faixa Crítica de Deriva Urbana (Buffer de 90 a 300 Metros)</h3>
+      <p>O projeto integra dados de sensoriamento remoto do <strong>MapBiomas (Coleção 9 / 10m e 30m)</strong> para calcular a proximidade física entre os talhões de monocultura e os perímetros urbanos das cidades brasileiras. Estudos de dispersão aerodinâmica comprovam que a pulverização por trator ou avião gera gotículas finas que derivam no ar por até 300 metros, depositando compostos neurotóxicos e cancerígenos diretamente sobre escolas, residências e poços freáticos periurbanos.</p>
+    </section>
+
+    <section>
+      <h2>3. O Vetor de Qualidade Hídrica: SISAGUA e Portaria GM/MS nº 888/2021</h2>
+      <p>O Sistema de Informação de Vigilância da Qualidade da Água para Consumo Humano (<strong>SISAGUA</strong>) monitora os parâmetros químicos nas estações de tratamento e redes de distribuição dos municípios brasileiros.</p>
+
+      <p>O <code>onco-causal</code> processa três classes críticas de contaminantes regulamentados pela Portaria GM/MS nº 888/2021:</p>
+      <ol>
+        <li><strong>Subprodutos da Desinfecção Hídrica (Trihalometanos — THM):</strong> Clorofórmio, bromodiclorometano, dibromoclorometano e bromofórmio. Gerados pela reação do cloro usado nas ETAs com a matéria orgânica em suspensão. São carcinógenos comprovados associados a câncer de bexiga e colorretal. Calculamos o índice cumulativo de <em>THM-anos</em> acima do Valor Máximo Permitido (VMP = 100 $\mu\text{g/L}$).</li>
+        <li><strong>Metais Pesados e Metaloides:</strong> Arsênio (IARC Grupo 1), Cádmio (Grupo 1) e Chumbo (Grupo 2A). Induzem estresse oxidativo severo, inibem enzimas de reparo de DNA e mimetizam estrogênio.</li>
+        <li><strong>Coquetéis de Pesticidas na Água:</strong> O monitoramento de 27 ingredientes ativos no SISAGUA (incluindo atrazina, glifosato, 2,4-D, malationa e tebuconazol), calculando o número anual de laudos com excedência do VMP e a taxa de detecção múltipla simultânea.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>4. O Vetor Atmosférico e Radiativo: SISAM/INPE e SEEG</h2>
+      <p>A poluição atmosférica é um carcinógeno humano confirmado pelo Grupo 1 da IARC (Monografia 109). O projeto incorpora:</p>
+      <ul>
+        <li><strong>Material Particulado Fino ($\text{PM}_{2.5}$):</strong> Reanálises de satélite do SISAM/INPE e Copernicus Atmosphere Monitoring Service (CAMS). Partículas $\le 2,5 \, \mu\text{m}$ penetram a barreira alvéolo-capilar, entram na corrente sanguínea sistêmica e transportam hidrocarbonetos policíclicos aromáticos e metais pesados adsorvidos na sua superfície.</li>
+        <li><strong>Poluentes Gasosos Industriais:</strong> Reanálise histórica de Dióxido de Nitrogênio ($\text{NO}_2$), Dióxido de Enxofre ($\text{SO}_2$) e Ozônio troposférico ($\text{O}_3$).</li>
+        <li><strong>Fontes Estacionárias Críticas:</strong> Inventário de emissões industriais do SEEG e localização georreferenciada de usinas termelétricas a carvão mineral e óleo combustível (SIGEL/ANEEL).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. O Vetor Ocupacional: LINACH e a Subnotificação Crônica</h2>
+      <p>A Lista Nacional de Agentes Cancerígenos para Humanos (<strong>LINACH</strong>, Portaria Interministerial MTE/MS/MPS nº 9/2014) classifica agentes comprovadamente carcinogênicos (Grupo 1 da IARC).</p>
+
+      <p>O <code>onco-causal</code> realiza o cruzamento determinístico entre a Relação Anual de Informações Sociais (<strong>RAIS</strong>), a Classificação Nacional de Atividades Econômicas (<strong>CNAE 2.0</strong>) e a Classificação Brasileira de Ocupações (<strong>CBO</strong>):</p>
+      <ul>
+        <li>Mapeamos a proporção municipal de trabalhadores formais alocados em setores de alto risco carcinogênico: petroquímica (benzeno), siderurgia (coque e HAPs), mineração (sílica livre cristalina e amianto), lavouras de grande porte (agrotóxicos) e calçadista (solventes clorados).</li>
+        <li>Incorporamos a classificação de <strong>Schilling</strong> para doenças ocupacionais:
+          <ul>
+            <li><em>Schilling I:</em> O trabalho é causa necessária (ex.: mesotelioma por amianto).</li>
+            <li><em>Schilling II:</em> O trabalho é fator contributivo (ex.: câncer de pulmão em fumante exposto a sílica).</li>
+            <li><em>Schilling III:</em> O trabalho agrava doença preexistente.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">O Apagão do SINAN e o Nexo Epidemiológico Previdenciário (B91)</div>
+        <p>Estudos recentes na <em>Revista Brasileira de Saúde Ocupacional</em> (Silva et al., 2023) mostram que o SINAN registra menos de 1% dos casos reais de câncer ocupacional no Brasil. As empresas evitam a notificação para não recolher alíquotas maiores do FAP/SAT ou sofrer ações de indenização civil. O <code>onco-causal</code> fornece o nexo técnico epidemiológico objetivo para que o INSS e o Ministério Público do Trabalho comprovem o nexo causal e emitam benefícios acidentários B91 independentemente de CAT emitida pela empresa.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Tratados de Engenharia e Ciência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

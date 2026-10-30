@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0001: Escopo do Projeto e as Armadilhas do LLM Council</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0001</span>
+    </div>
+    <span class="badge">Módulo 1: Fundamentos & Estratégia</span>
+    <h1>Lição 0001: O Escopo do onco-causal e as Quatro Armadilhas Apontadas pelo Council</h1>
+    <p>Compreenda o propósito real do projeto e domine as correções exigidas pelo conselho de modelos para transformar uma tese acadêmica em um projeto vencedor do AI4Good.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. O Escopo Real do Projeto</h2>
+      <p>O <strong>onco-causal</strong> não é apenas um pipeline estatístico. Ele é uma plataforma cívica de inteligência artificial causal desenhada para responder a uma das maiores tragédias de saúde pública do Brasil: <em>onde e quanto o câncer está matando silenciosamente devido à contaminação por agrotóxicos, água poluída e fumaça industrial, rompendo o manto de invisibilidade gerado pelo colapso da notificação no SUS</em>.</p>
+      
+      <p>Para isso, o projeto integra 40 anos de dados históricos dos <strong>5.570 municípios brasileiros</strong>, unificando quatro vetores carcinogênicos (agroquímica, água de abastecimento do SISAGUA, reanálise atmosférica e exposição ocupacional da LINACH) cruzados com a mortalidade oncológica do SIM/DATASUS.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">O Alerta Central do LLM Council</div>
+        <p>O conselho de múltiplos modelos deliberou em 30/10/2026 e concluiu: <strong>o projeto possui densidade científica extraordinária, mas se for apresentado como um artigo teórico de econometria espacial, será desclassificado ou perderá o Demo Day</strong>. O edital da Brazil Conference em Harvard e MIT exige ferramentas práticas de código aberto com impacto tangível na sociedade.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. As Quatro Armadilhas Estruturais e Como Neutralizá-las</h2>
+
+      <h3>Armadilha 1: O Hermetismo Acadêmico (Barreira de Linguagem)</h3>
+      <p><strong>O Problema:</strong> Apresentar o projeto como <em>"Modelagem Espaço-Temporal de Carcinógenos Múltiplos via Modelos de Fundação Tabulares e Econometria Semiparamétrica"</em> afasta jurados generalistas, investidores e lideranças cívicas da triagem.</p>
+      <p><strong>A Solução:</strong> Inverter a pirâmide da comunicação. A abertura do pitch deve ser humana e voltada para a ação:</p>
+      <div class="pitch-box">
+        <div class="pitch-title">🎯 Pitch de 30 Segundos Aprovado pelo Council</div>
+        <p>"O OncoCausal é a primeira IA aberta do Brasil que enxerga através da falta de hospitais para revelar onde o agrotóxico e a água contaminada matam por câncer em silêncio — e entrega um simulador gratuito para prefeitos saberem exatamente quantas vidas salvam criando faixas de proteção."</p>
+      </div>
+
+      <h3>Armadilha 2: A Ausência de Interface Visual (Risco do "Código Sem Cara")</h3>
+      <p><strong>O Problema:</strong> O repositório possui excelente infraestrutura de dados em Parquet, queries no BigQuery e contratos de dados, mas zero linhas de código de interface de usuário (UI). Sem front-end navegável no Demo Day (05/12/2026), o projeto perde para competidores com IAs mais ingênuas mas que possuem mapas clicáveis.</p>
+      <p><strong>A Solução:</strong> Desenvolver durante a fase de aceleração um dashboard interativo (Streamlit ou web app leve) materializando os dois produtos:</p>
+      <ul>
+        <li><strong>Simulador Contrafactual:</strong> Um controle deslizante onde o jurado seleciona um município agrícola (ex.: Sorriso-MT), altera a zona de exclusão de pulverização (300m) e vê a estimativa de óbitos infantis e leucemias evitados em 10 anos.</li>
+        <li><strong>Índice de Divergência de Vigilância (IDV):</strong> Um mapa nacional apontando os <em>Silent Hotspots</em> onde o modelo detecta alto risco químico mas a notificação oficial do SINAN é zero.</li>
+      </ul>
+
+      <h3>Armadilha 3: Sobrecarga Computacional no Demo Day</h3>
+      <p><strong>O Problema:</strong> Tentar rodar inferência em contexto com Transformers tabulares pesados (TabFM 400M) ao vivo depende de clusters de GPU sujeitos a latência ou falhas de rede no palco.</p>
+      <p><strong>A Solução:</strong> Usar uma arquitetura de demonstração híbrida: pré-computar as matrizes de predição e resíduos no BigQuery e servi-las via DuckDB/Polars em memória subsegundo no navegador.</p>
+
+      <h3>Armadilha 4: A Regra Pétrea de Equipe do Edital</h3>
+      <p><strong>O Problema:</strong> O edital oficial (Página 6) veda explicitamente inscrições individuais ou equipes maiores de 3 membros. Ele exige grupos de <strong>2 a 3 cidadãos brasileiros</strong>.</p>
+      <p><strong>A Solução:</strong> Formalizar a inscrição com 2 ou 3 integrantes, delimitando claramente a complementaridade de papéis: Saúde Coletiva/Epidemiologia, Machine Learning/Estatística e Produto/Design.</p>
+    </section>
+
+    <section>
+      <h2>3. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. Qual é o posicionamento estratégico recomendado pelo LLM Council para o OncoCausal vencer o AI4Good na Brazil Conference?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. Focar apenas na matemática afasta os jurados generalistas.')">
+            Apresentar prioritariamente as deduções analíticas de convergência assintótica de Neyman.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Exato! O produto acionável na frente e o rigor metodológico como sustentação.', '')">
+            Posicionar o Simulador Contrafactual e o IDV como produtos cívicos, usando o DML como motor invisível.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. O edital valoriza a inovação tecnológica ética de IA.')">
+            Substituir os algoritmos de IA por estatísticas descritivas simples para não assustar o público.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recurso Primário Recomendado</h2>
+      <p>Leia o documento <a href="../reference/cheat-sheet-banca.html">Cheat Sheet de Defesa Técnica Oral</a> para memorizar as respostas curtas às seis perguntas mais difíceis da banca.</p>
+      
+      <div class="callout callout-info">
+        <div class="callout-title">Dúvidas?</div>
+        <p>Esta lição é interativa. Se qualquer ponto sobre o diagnóstico do Council ou o escopo não estiver 100% claro, faça uma pergunta ao assistente antes de avançar para a Lição 0002.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Lição 0001</span>
+    <a href="0002-inferencia-causal-e-double-ml.html">Próxima: Lição 0002 (Inferência Causal & DML) →</a>
+  </footer>
+
+</body>
+</html>

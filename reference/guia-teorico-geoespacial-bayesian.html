@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratado Técnico: Epidemiologia Espacial e Suavização Bayesiana — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Tratados Técnicos Aprofundados</span>
+    </div>
+    <h1>Tratado Técnico: Bioestatística Espacial, Padronização Etária e Suavização Bayesiana Empírica</h1>
+    <p>Dedução matemática e fundamentação geoespacial baseada em Lance Waller, Carol Gotway, Luc Anselin, Sergio Rey e David Roberts.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. A Demografia do Câncer e a Padronização Etária (Direct ASR vs. SMR)</h2>
+      <p>O câncer é uma patologia crônica cuja incidência e letalidade crescem exponencialmente com o envelhecimento populacional. No Brasil, municípios do Sul e Sudeste possuem pirâmides etárias mais maduras (maior proporção de idosos acima de 65 anos) do que municípios do Norte e Centro-Oeste, onde a população jovem predomina.</p>
+
+      <h3>Por Que a Taxa Bruta Engana?</h3>
+      <p>A taxa bruta de mortalidade (óbitos totais divididos pela população total multiplicados por 100 mil) confunde o envelhecimento demográfico com risco ambiental. Uma cidade idosa no interior paulista sem nenhuma lavoura parecerá ter risco de câncer três vezes maior que uma cidade de fronteira agrícola com população jovem de 25 anos, mesmo que a água desta última esteja saturada de pesticidas.</p>
+
+      <h3>Padronização Direta pela População Mundial da OMS ($\text{ASR}$)</h3>
+      <p>O <code>onco-causal</code> decompõe a população e os óbitos de cada município em 17 faixas etárias quinquenais $a \in \{0\text{–}4, 5\text{–}9, \dots, 75\text{–}79, 80+\}$. A <strong>Taxa Padronizada por Idade ($\text{ASR}$ por 100.000 habitantes)</strong> é calculada ponderando as taxas específicas por idade de cada município pela população padrão mundial da OMS ($w_a^{\text{OMS}}$):</p>
+      $$\text{ASR}_i = \sum_{a=1}^{17} \left( \frac{O_{i,a}}{P_{i,a}} \times 100.000 \right) \cdot w_a^{\text{OMS}}, \quad \text{onde } \sum_{a=1}^{17} w_a^{\text{OMS}} = 1$$
+      <p>A variância teórica da $\text{ASR}$ é obtida sob o modelo de Poisson:</p>
+      $$\text{Var}(\text{ASR}_i) = \sum_{a=1}^{17} (w_a^{\text{OMS}})^2 \frac{O_{i,a}}{(P_{i,a})^2} \times 10^{10}$$
+
+      <h3>Razão de Mortalidade Padronizada (SMR / Padronização Indireta)</h3>
+      <p>Complementarmente, calculamos a Razão de Mortalidade Padronizada ($\text{SMR}_i = O_i / E_i$), onde o número de óbitos esperados $E_i$ é calculado aplicando as taxas específicas nacionais brasileiras sobre a população municipal:</p>
+      $$E_i = \sum_{a=1}^{17} P_{i,a} \cdot \left( \frac{\sum_j O_{j,a}}{\sum_j P_{j,a}} \right)$$
+      <p>Um $\text{SMR}_i = 1,40$ indica que o município registrou 40% mais óbitos do que o esperado para uma população de mesma estrutura etária no Brasil.</p>
+    </section>
+
+    <section>
+      <h2>2. O Problema das Pequenas Áreas e a Instabilidade Estatística</h2>
+      <p>No tratado <em>Applied Spatial Statistics for Public Health Data</em>, <strong>Lance Waller e Carol Gotway (2004)</strong> demonstram o comportamento patológico de taxas em pequenas populações:</p>
+      
+      <p>Em um município de 3.000 habitantes, o número de óbitos esperados para um câncer raro (ex.: leucemia infantil) é próximo de zero ($E_i \approx 0,05$).</p>
+      <ul>
+        <li>Se ocorrer <strong>1 óbito</strong> no ano: $\text{Taxa Bruta} = 33,3 \text{ por 100k hab.}$, gerando um $\text{SMR} = 20,0$ (alerta falso-positivo estrondoso).</li>
+        <li>Se ocorrer <strong>0 óbito</strong>: $\text{Taxa Bruta} = 0$, gerando um $\text{SMR} = 0$ (falso-negativo absoluto).</li>
+      </ul>
+
+      <p>Em um mapa coroplético do Brasil, os municípios menores visualmente "piscam" de ano em ano entre extremos de zero e vermelho vivo. Esse ruído amostral violaria qualquer suposição de homocedasticidade em modelos de machine learning.</p>
+    </section>
+
+    <section>
+      <h2>3. Dedução Matemática do Spatial Linear Empirical Bayes (PySAL)</h2>
+      <p>A formulação implementada em <code>src/spatial/smoothing.py</code> segue o modelo de <strong>Clayton & Kaldor (1987)</strong> e <strong>Luc Anselin (1995/2006)</strong>.</p>
+
+      <h3>O Modelo Hierárquico Bayesiano</h3>
+      <p>Assumimos que o número de óbitos $O_i$ segue uma distribuição de Poisson condicionada a um risco relativo latente $\theta_i$:</p>
+      $$O_i \mid \theta_i \sim \text{Poisson}(E_i \theta_i)$$
+      <p>O risco latente $\theta_i$ possui uma distribuição a priori que reflete a variabilidade espacial ao redor de uma média local $\mu_i$:</p>
+      $$\mathbb{E}[\theta_i] = \mu_i, \quad \text{Var}(\theta_i) = \sigma_i^2$$
+
+      <h3>A Derivação do Estimador Linear de Encolhimento (Shrinkage)</h3>
+      <p>O estimador de Bayes empírico minimiza o erro quadrático médio Bayesiano, resultando em uma média ponderada linear entre a taxa municipal observada $r_i = O_i / E_i$ e a média a priori da vizinhança espacial $\mu_{\text{local}, i}$:</p>
+      $$\hat{\theta}_i^{\text{EB}} = w_i r_i + (1 - w_i) \mu_{\text{local}, i}$$
+
+      <h3>O Cálculo do Fator de Ponderação $w_i$</h3>
+      <p>Pela regra de Bayes, o peso atribuído ao dado municipal próprio é dado por:</p>
+      $$w_i = \frac{\sigma_i^2}{\sigma_i^2 + \frac{\mu_{\text{local}, i}}{E_i}}$$
+      
+      <p><strong>Comportamento dos Limites Assintóticos:</strong></p>
+      <ul>
+        <li><strong>Metrópoles e Cidades Médias ($E_i \to \infty$):</strong> O termo de ruído $\mu / E_i \to 0$, de modo que $w_i \to 1$. O estimador preserva 100% da informação local do município, pois o dado observado é fidedigno.</li>
+        <li><strong>Pequenos Municípios Rurais ($E_i \to 0$):</strong> O ruído $\mu / E_i \to \infty$, forçando $w_i \to 0$. O estimador encolhe a taxa para a média dos vizinhos, estabilizando o denominador sem eliminar o sinal estrutural da região.</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Por Que $k=31$ Vizinhos Mais Próximos?</div>
+        <p>A matriz de pesos espaciais é construída pelo método $k$-Nearest Neighbors com $k = 31$. Matrizes de contiguidade clássicas (Queen ou Rook) quebram no Brasil: municípios da Amazônia têm 2 ou 3 vizinhos gigantescos, enquanto municípios do Vale do Paraíba têm dezenas de vizinhos minúsculos. O fixador $k = 31$ garante suporte amostral homogêneo e graus de liberdade estáveis em todos os biomas.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Autocorrelação Espacial e Estatística LISA (Anselin / Rey)</h2>
+      <p>Para testar se os agrotóxicos e o câncer formam aglomerados espaciais reais além do acaso, o <code>onco-causal</code> aplica a estatística de <strong>Moran Global</strong> e o <strong>LISA (Local Indicators of Spatial Association)</strong>:</p>
+
+      $$I = \frac{N}{\sum_i \sum_j W_{ij}} \frac{\sum_i \sum_j W_{ij} (x_i - \bar{x})(x_j - \bar{x})}{\sum_i (x_i - \bar{x})^2}$$
+      
+      <p>O LISA identifica quatro quadrantes espaciais cruciais:</p>
+      <ol>
+        <li><strong>High-High (Hotspots):</strong> Municípios de alta taxa cercados por vizinhos de alta taxa (focos endêmicos de exposição na bacia do Xingu ou no Oeste Paranaense).</li>
+        <li><strong>Low-Low (Coldspots):</strong> Áreas preservadas sem agricultura intensiva e com baixas taxas.</li>
+        <li><strong>High-Low e Low-High (Outliers Espaciais):</strong> Municípios atípicos indicativos de viés assistencial local ou presença pontual de polos industriais pesados.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>5. Prevenção de Vazamento com Nested Spatial Block CV (Roberts et al.)</h2>
+      <p>Em artigo publicado na <em>Ecography (2017)</em>, David Roberts et al. alertaram que modelos preditivos geoespaciais sofrem de <strong>Spatial Data Leakage</strong> catastrófico quando divididos por amostragem aleatória.</p>
+
+      <p>Para solucionar isso, o <code>onco-causal</code> projeta a malha cartográfica em <strong>SIRGAS 2000 Albers Equal Area (EPSG:5070)</strong> — preservando áreas reais sem distorção métrica — e executa particionamento espacial em 5 dobras agrupadas por <strong>Ottobacias Hidrográficas da ANA (Nível 4 e 5)</strong>:</p>
+
+      <ul>
+        <li>Os conjuntos de treino e teste são separados por linhas de cumeada de bacias hidrográficas.</li>
+        <li>No TabFM, <strong>nenhuma linha do conjunto de suporte (support set) pertence à mesma bacia hidrográfica das linhas de teste (query set)</strong>.</li>
+        <li>Isso garante que o modelo aprenda causalidade biofísica e relações dose-resposta generalizáveis, em vez de memorizar coordenadas de latitude e longitude.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Tratados de Engenharia e Ciência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

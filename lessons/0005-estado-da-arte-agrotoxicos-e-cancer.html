@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0005: Estado da Arte de Agrotóxicos e Câncer</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0005</span>
+    </div>
+    <span class="badge">Módulo 5: Literatura & Saúde Ambiental</span>
+    <h1>Lição 0005: A Literatura Científica Existente vs. O Ineditismo do onco-causal</h1>
+    <p>Conheça os principais estudos prévios sobre agrotóxicos e câncer no Brasil e no mundo, entenda suas limitações e domine a prova de novidade do projeto.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. O Cenário Nacional de Pesquisa em Agrotóxicos e Saúde</h2>
+      <p>A literatura científica brasileira acumulou evidências contundentes sobre a contaminação ambiental, mas todos os trabalhos anteriores enfrentavam gargalos metodológicos insuperáveis:</p>
+
+      <h3>A. O Grupo de Wanderlei Pignati (UFMT)</h3>
+      <p>Em 2017, Pignati et al. publicaram o método clássico na <em>Ciência & Saúde Coletiva</em> de calcular o volume de agrotóxicos por município multiplicando a área plantada do PAM/IBGE por taxas do IBAMA. Antes, Curvo et al. (2013) mostraram correlação bivariada com leucemias infantis em Mato Grosso.</p>
+      <p><strong>Limitação que o onco-causal supera:</strong> O trabalho de Pignati foi estritamente de mensuração de exposição, sem modelagem de causalidade clínica, sem lags de latência e sem expansão preditiva nacional.</p>
+
+      <h3>B. Os Estudos Hídricos do SISAGUA (Carolina Panis et al.)</h3>
+      <p>Em 2022 e 2024 (na <em>Environment International</em> e <em>Science of The Total Environment</em>), Carolina Panis avaliou os 27 agrotóxicos monitorados na água de abastecimento pelo SISAGUA, projetando riscos oncológicos teóricos.</p>
+      <p><strong>Limitação que o onco-causal supera:</strong> Foco exclusivo no Sudoeste do Paraná, baseado em modelos toxicológicos da EPA que não controlam a estrutura hospitalar (CACON/UNACON) nem o saneamento concorrente.</p>
+
+      <h3>C. Geografia Crítica e Colonialismo Químico (Larissa Bombardi)</h3>
+      <p>O Atlas de Larissa Bombardi (FFLCH/USP) mapeou o uso de agrotóxicos banidos na União Europeia e estimou a subnotificação do SINAN (1 caso registrado para cada 50 a 70 reais).</p>
+      <p><strong>Limitação que o onco-causal supera:</strong> Análise documental e cartográfica descritiva; não desenvolve modelos de inteligência artificial nem ferramentas de simulação para gestores públicos.</p>
+    </section>
+
+    <section>
+      <h2>2. O Cenário Internacional (AHS e Causal ML)</h2>
+
+      <h3>A. O Agricultural Health Study (AHS — NIH/EPA/NCI)</h3>
+      <p>Coorte prospectiva americana de 89.000 aplicadores de pesticidas em Iowa e Carolina do Norte. Embora seja a maior referência mundial, analisa a realidade de fazendeiros com alta mecanização nos EUA, sem considerar a contaminação hídrica em massa e a deriva sobre perímetros urbanos no Sul Global.</p>
+
+      <h3>B. O Laboratório de Causal ML de Francesca Dominici (Harvard)</h3>
+      <p>Pioneiros na aplicação de Double Machine Learning e modelos causais para saúde pública (Medicare nos EUA). No entanto, o foco de Harvard tem sido estritamente <strong>poluição do ar ($\text{PM}_{2.5}$)</strong> e mortalidade de curto prazo em idosos. Nunca aplicaram DML para agrotóxicos, água do SISAGUA ou modelos fundacionais tabulares no Brasil.</p>
+
+      <div class="pitch-box">
+        <div class="pitch-title">🎙️ Resposta de 30 Segundos para a Banca</div>
+        <p>"Os estudos nacionais de Pignati, Panis e Bombardi comprovaram a contaminação, mas pararam em estatísticas descritivas sem isolar a causalidade frente à falta de hospitais. Já a literatura internacional de Harvard aplica Causal ML apenas para poluição do ar nos EUA. O OncoCausal é pioneiro mundial ao unificar quatro vetores de poluição, impor defasagens biológicas de até 25 anos e aplicar Double Machine Learning e TabFM na malha de 5.570 municípios do Brasil."</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. Qual é a principal limitação metodológica dos estudos ecológicos anteriores de agrotóxicos e câncer no Brasil?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. O DATASUS possui registros públicos desde a década de 1980.')">
+            A inexistência de bases públicas de mortalidade oncológica no DATASUS antes de 2020.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Exato! Ignorar a latência e não controlar a presença de hospitais oncológicos distorcem as conclusões.', '')">
+            A cegueira temporal por cruzamento contemporâneo e a falta de controle do viés de detecção assistencial.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. A estimativa de Pignati cobre soja, milho, algodão e cana.')">
+            A incapacidade de estimar lavouras de monocultura através dos dados agrícolas oficiais do IBGE.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recurso Primário Recomendado</h2>
+      <p>Consulte a <a href="../reference/comparativo-metodologico.html">Matriz Comparativa do Estado da Arte</a> para verificar os links e DOIs de todos os estudos citados.</p>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <a href="0004-tabfm-vs-gbdt-prior-data-fitted-networks.html">← Lição 0004 (TabFM vs GBDT)</a>
+    <a href="0006-xai-simulador-contrafactual-e-idv.html">Próxima: Lição 0006 (XAI, Simulador & IDV) →</a>
+  </footer>
+
+</body>
+</html>

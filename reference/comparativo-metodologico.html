@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparativo do Estado da Arte — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Referência</span>
+    </div>
+    <h1>Matriz Comparativa do Estado da Arte Científico</h1>
+    <p>Mapeamento sistemático confrontando a literatura nacional e internacional com as inovações introduzidas pelo <code>onco-causal</code>.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Síntese Estrutural: O que a literatura fez vs. O que o Onco-Causal inova</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Dimensão Metodológica</th>
+            <th>Literatura Nacional Precursora</th>
+            <th>Literatura Internacional</th>
+            <th>Inovação do onco-causal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Exposições Integradas</strong></td>
+            <td>Univetorial: agrotóxicos (<a href="https://doi.org/10.1590/1413-812320172210.17742017" target="_blank">Pignati 2017</a>) ou água (<a href="https://doi.org/10.1016/j.envint.2022.107321" target="_blank">Panis 2022</a>).</td>
+            <td>Univetorial: aplicadores (<a href="https://doi.org/10.1289/ehp.0901731" target="_blank">AHS</a>) ou PM2.5 (<a href="https://doi.org/10.1126/sciadv.aba5692" target="_blank">Wu/Dominici 2020</a>).</td>
+            <td><strong>Quadrivetorial:</strong> Lavoura (PAM/IBAMA) + Água (SISAGUA) + Ar (SISAM) + Ocupação (LINACH).</td>
+          </tr>
+          <tr>
+            <td><strong>Latência Tumoral</strong></td>
+            <td>Inexistente: cruzamento contemporâneo $t_0 \times t_0$ (cegueira temporal).</td>
+            <td>Parcial: tempo de profissão acumulado em coortes fechadas.</td>
+            <td><strong>Lags Diferenciados:</strong> $t-2..5$ anos (hematológicos) e $t-10..25$ anos (tumores sólidos).</td>
+          </tr>
+          <tr>
+            <td><strong>Pequenas Áreas</strong></td>
+            <td>Taxas brutas instáveis em municípios com menos de 20k hab.</td>
+            <td>Exclusão de condados pequenos ou MCMC bayesiano lento.</td>
+            <td><strong>Spatial Linear Empirical Bayes ($k=31$):</strong> Suavização na malha completa de 5.570 municípios.</td>
+          </tr>
+          <tr>
+            <td><strong>Viés Assistencial</strong></td>
+            <td>Não controlado: leitos de hospital aparecem aumentando o câncer.</td>
+            <td>Ajustes por convênio privado (inaplicável ao SUS universal).</td>
+            <td><strong>Double Machine Learning:</strong> Ortogonalização de Neyman purgando leitos (CNES) e saneamento (SNIS).</td>
+          </tr>
+          <tr>
+            <td><strong>Vazamento Espacial</strong></td>
+            <td>Random Split no scikit-learn (violação da Lei de Tobler).</td>
+            <td>Divisão por condados ou buffers isolados.</td>
+            <td><strong>Nested Spatial Block CV:</strong> 5-fold bloqueando bacias hidrográficas (Ottobacias da ANA).</td>
+          </tr>
+          <tr>
+            <td><strong>Modelos Utilizados</strong></td>
+            <td>Regressão linear simples, Poisson, Joinpoint.</td>
+            <td>Modelos de Cox, Random Forest, GBDT.</td>
+            <td><strong>Benchmark Tri-Paradigma:</strong> TabFM (Transformer PFN) vs TabNet vs GBDTs + TreeSHAP.</td>
+          </tr>
+          <tr>
+            <td><strong>Produtos Finais</strong></td>
+            <td>Recomendações qualitativas gerais em artigos.</td>
+            <td>Simulações de ar da EPA (BenMAP).</td>
+            <td><strong>Ferramentas Operacionais:</strong> Simulador Contrafactual de Vidas Salvas e Índice de Divergência (IDV).</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>As 3 Principais Referências Nacionais e Suas Limitações</h2>
+      
+      <div class="callout">
+        <div class="callout-title">1. Wanderlei Pignati et al. (UFMT) — Ciência & Saúde Coletiva (2017)</div>
+        <p>Desenvolveu o método clássico de estimar a carga de agrotóxicos multiplicando hectares de soja, milho, algodão e cana por coeficientes técnicos do IBAMA. <em>Limitação:</em> Estudo estritamente de exposição descritiva, sem modelagem de mortalidade ou causalidade.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">2. Carolina Panis et al. — Environment International (2022) & STOTEN (2024)</div>
+        <p>Mapeou os 27 agrotóxicos do SISAGUA no Paraná calculando índices teóricos de risco de câncer. <em>Limitação:</em> Focado apenas no Paraná, baseado em modelos toxicológicos lineares teóricos sem controlar para hospitais oncológicos, renda ou saneamento.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">3. Larissa Bombardi — Geografia do Uso de Agrotóxicos (FFLCH/USP, 2017/2023)</div>
+        <p>Mapeou as assimetrias internacionais de regulação química e dimensionou a subnotificação do SINAN (1 caso notificado para cada 50 a 70 reais). <em>Limitação:</em> Tratado cartográfico descritivo; não propõe modelo preditivo nem algoritmo para auditoria ativa.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Matriz de Referência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

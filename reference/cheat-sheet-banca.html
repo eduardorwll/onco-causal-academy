@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheat Sheet de Defesa Técnica Oral — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Referência Rápida</span>
+    </div>
+    <h1>Arsenal de Defesa Técnica: Respostas Rápidas para a Banca</h1>
+    <p>Respostas de 30 segundos calibradas para jurados técnicos, comitê de seleção do AI4Good e pesquisadores de Harvard/MIT.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Matriz de Perguntas Provocativas e Respostas Imediatas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Pergunta Provocativa da Banca</th>
+            <th>Autor / Referência Canônica</th>
+            <th>Resposta Curta e Cirúrgica (30 segundos)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>"Estudos ecológicos sofrem da falácia ecológica. Como confiar nesse risco?"</strong></td>
+            <td><strong>Hernán & Robins (2020)</strong><br><em>Causal Inference: What If</em></td>
+            <td><em>"Nosso objetivo não é diagnosticar o indivíduo X, mas mensurar o <strong>risco populacional atribuível</strong> para intervenções de saúde pública. Como o agrotóxico na água e a fumaça de queimadas são exposições inerentemente territoriais, a política de saneamento e zonas de exclusão de pulverização é municipal."</em></td>
+          </tr>
+          <tr>
+            <td><strong>"Cidades com grandes hospitais registram mais câncer. Como provam que não medem só acesso?"</strong></td>
+            <td><strong>Chernozhukov et al. (2018)</strong><br><em>Applied Causal Inference Powered by ML</em></td>
+            <td><em>"Esse é o clássico paradoxo do viés de detecção. Em regressões ingênuas, leitos de CACON/UNACON aparecem com sinal positivo absurdo. Nós resolvemos isso via <strong>Double Machine Learning</strong>: as variáveis do CNES e SNIS são modeladas como funções nuisance de alta dimensão e purgadas pelos resíduos ortogonalizados de Neyman."</em></td>
+          </tr>
+          <tr>
+            <td><strong>"Por que não cruzaram a poluição de 2024 com os óbitos de 2024?"</strong></td>
+            <td><strong>IARC / Literatura de Carcinogênese</strong></td>
+            <td><em>"Porque isso violaria a biologia tumoral. Cânceres sólidos têm latência de 10 a 25 anos; tumores hematológicos de 2 a 5 anos. Cruzar exposições contemporâneas causa cegueira temporal e causalidade reversa. Todas as nossas covariáveis de exposição respeitam lags retrospectivos fisiopatológicos."</em></td>
+          </tr>
+          <tr>
+            <td><strong>"Vocês usaram K-Fold normal ou train_test_split aleatório?"</strong></td>
+            <td><strong>Roberts et al. (2017)</strong><br><em>Ecography / Spatial Block CV</em></td>
+            <td><em>"Jamais. Um split aleatório comete vazamento de dados espacial (Spatial Data Leakage), porque municípios vizinhos compartilham o mesmo aquífero e ar. Usamos <strong>Nested Spatial Block Cross-Validation</strong> em sub-bacias hidrográficas (Ottobacias da ANA), testando o modelo em bacias inteiras que ele nunca viu."</em></td>
+          </tr>
+          <tr>
+            <td><strong>"Por que insistir em TabFM/TabPFN se XGBoost já resolve quase tudo em tabelas?"</strong></td>
+            <td><strong>Grinsztajn et al. (NeurIPS 2022) & Hollmann (ICLR 2023)</strong></td>
+            <td><em>"Mantemos os GBDTs como nossos baselines estritos, respeitando Grinsztajn et al. No entanto, o TabFM oferece Aprendizagem em Contexto pré-treinada em grafos causais. Sob bloqueio espacial de bacias, o TabFM generaliza melhor para municípios com dados escassos, operando de forma nativa no BigQuery sem backpropagation."</em></td>
+          </tr>
+          <tr>
+            <td><strong>"Como provam que o efeito de agrotóxicos não é uma variável omitida aleatória?"</strong></td>
+            <td><strong>Sharma & Kiciman (2020)</strong><br><em>DoWhy (Microsoft Research)</em></td>
+            <td><em>"Nós submetemos nosso modelo aos 3 testes de refutação do DoWhy: tratamento placebo, variáveis comuns aleatórias e reamostragem espacial. Em todos os testes, o efeito do placebo colapsou para zero e a estimativa original manteve significância estatística com p &gt; 0,05 na refutação."</em></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Dica de Ouro para a Apresentação</div>
+      <p>Em bancas generalistas, <strong>comece sempre pela dor humana e pelos produtos</strong>: <em>"OncoCausal é a primeira IA de código aberto que enxerga através do viés dos hospitais para revelar onde o agrotóxico mata em silêncio no SUS — e entrega um Simulador Contrafactual para prefeitos saberem quantas vidas salvam mudando a lei."</em> Deixe os detalhes de Neyman Orthogonality e PFNs para quando os jurados técnicos fizerem perguntas provocativas.</p>
+    </div>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Sistema de Ensino</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

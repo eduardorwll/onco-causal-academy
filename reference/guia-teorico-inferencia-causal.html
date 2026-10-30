@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratado Técnico: Inferência Causal e Double Machine Learning — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Tratados Técnicos Aprofundados</span>
+    </div>
+    <h1>Tratado Técnico: Inferência Causal, DAGs e Double Machine Learning</h1>
+    <p>Fundamentação conceitual, matemática e algorítmica detalhada baseada em Scott Cunningham, Miguel Hernán, James Robins e Victor Chernozhukov.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Teoria dos Desfechos Potenciais e a Definição Formal de Causalidade</h2>
+      <p>A inferência causal no <code>onco-causal</code> fundamenta-se no arcabouço de <strong>Desfechos Potenciais (Potential Outcomes Framework)</strong> de Jerzy Neyman (1923) e Donald Rubin (1974), expandido para a epidemiologia contemporânea por <strong>Miguel Hernán e James Robins (Harvard University)</strong> no tratado <em>Causal Inference: What If</em>.</p>
+
+      <p>Para cada unidade territorial municipal $i$ ($i = 1, \dots, N$):</p>
+      <ul>
+        <li>Seja $D_i \in \mathbb{R}^k$ o vetor contínuo de exposição aos carcinógenos ambientais (ex.: consumo municipal de agrotóxicos em L/ha, excedências de contaminantes no SISAGUA, $\text{PM}_{2.5}$ reanalisado e trabalhadores sob a LINACH).</li>
+        <li>Seja $Y_i(d)$ o desfecho potencial que seria observado no município $i$ se, contrafactualmente, sua exposição fosse fixada no nível $d$.</li>
+        <li>O desfecho observado no SIM/DATASUS é unicamente $Y_i = Y_i(D_i)$. O desfecho contrafactual $Y_i(d')$ para qualquer nível alternativo $d' \neq D_i$ é estritamente não observável (o <em>Problema Fundamental da Inferência Causal</em>).</li>
+      </ul>
+
+      <h3>A Diferença Entre Associação e Causalidade</h3>
+      <p>A diferença ingênua observada entre municípios com alta exposição ($D=1$) e baixa exposição ($D=0$) decompõe-se matematicamente em duas parcelas:</p>
+      $$\mathbb{E}[Y \mid D=1] - \mathbb{E}[Y \mid D=0] = \underbrace{\mathbb{E}[Y(1) - Y(0) \mid D=1]}_{\text{Efeito Causal Médio nos Tratados (ATT)}} + \underbrace{\left( \mathbb{E}[Y(0) \mid D=1] - \mathbb{E}[Y(0) \mid D=0] \right)}_{\text{Viés de Seleção / Confundimento}}$$
+      
+      <p>Em dados ecológicos de saúde pública no Brasil, o viés de seleção não é nulo. Municípios do agronegócio ou polos industriais diferem sistematicamente de municípios tradicionais em termos de renda per capita, saneamento básico e presença de hospitais CACON/UNACON. Sem neutralizar esse viés, a diferença observada não reflete o efeito tóxico real.</p>
+    </section>
+
+    <section>
+      <h2>2. As Três Premissas de Identificabilidade de Hernán & Robins</h2>
+      <p>Para que o Efeito Médio do Tratamento ($\text{ATE} = \mathbb{E}[Y(d) - Y(d')]$) seja identificável a partir de dados observacionais, o <code>onco-causal</code> satisfaz formalmente três axiomas:</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">1. Permutabilidade Condicional (Conditional Exchangeability / Unconfoundedness)</div>
+        <p>$$Y(d) \perp D \mid Z \quad \forall d$$</p>
+        <p>Condicional ao vetor multidimensional de controle $Z$ (infraestrutura hospitalar do CNES, cobertura de esgoto e água tratada do SNIS, pirâmide etária e renda do Censo IBGE), a distribuição dos desfechos potenciais de câncer independe da dose de exposição recebida. Em termos epidemiológicos: se trocássemos os municípios expostos pelos não expostos, mantendo o vetor $Z$ fixo, a taxa basal de câncer seria idêntica.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">2. Positividade (Positivity)</div>
+        <p>$$P(D \in \mathcal{A} \mid Z = z) > 0 \quad \forall z \text{ com } P(Z=z) > 0$$</p>
+        <p>Para qualquer combinação observada de características socioassistenciais $z$, deve haver probabilidade positiva de encontrar municípios com diferentes níveis de exposição. Como a distribuição de monoculturas, bacias hidrográficas e parques industriais no Brasil abrange municípios de todas as faixas de renda e portes populacionais, a positividade é estritamente satisfeita.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">3. Consistência (Consistency)</div>
+        <p>$$Y_i = Y_i(d) \quad \text{se } D_i = d$$</p>
+        <p>A intervenção observada corresponde exatamente à intervenção contrafactual teórica, sem múltiplas versões ocultas do tratamento que alterem o desfecho.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Grafos Acíclicos Direcionados (DAGs) e o Critério da Porta dos Fundos (Cunningham)</h2>
+      <p>No livro <em>Causal Inference: The Mixtape</em>, <strong>Scott Cunningham</strong> formaliza as regras visuais de Judea Pearl para identificar se um conjunto de covariáveis $Z$ é suficiente para isolar a causalidade sem introduzir distorções espúrias:</p>
+
+      <h3>As Três Topologias Fundamentais de Grafos</h3>
+      <ol>
+        <li><strong>Cadeia (Chain / Mediador):</strong> $D \to M \to Y$. A exposição química induz estresse oxidativo ou mutação genética ($M$), que por sua vez causa a neoplasia ($Y$). <em>Regra de Ouro:</em> Se controlarmos por $M$, bloqueamos o caminho causal e destruímos a estimativa do efeito total!</li>
+        <li><strong>Bifurcação (Fork / Confundidor):</strong> $D \leftarrow Z \to Y$. O desenvolvimento econômico regional ($Z$) atrai lavouras intensivas ($D$) e financia hospitais de alta complexidade que diagnosticam mais câncer ($Y$). $Z$ é uma causa comum que abre uma "porta dos fundos" espúria. <em>Regra de Ouro:</em> $Z$ DEVE ser condicionado/bloqueado.</li>
+        <li><strong>Colisor (Collider / M-Bias):</strong> $D \to C \leftarrow Y$. Uma variável $C$ que é efeito comum da exposição e da doença. <em>Regra de Ouro:</em> O colisor é naturalmente bloqueado; se você condicionar em $C$, você <strong>abre</strong> um caminho espúrio e cria uma correlação artificial inexistente (Viés de Seleção / Paradoxo de Berkson).</li>
+      </ol>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">O Critério da Porta dos Fundos (Backdoor Criterion)</div>
+        <p>Um conjunto de covariáveis $Z$ satisfaz o critério da porta dos fundos em relação a $(D, Y)$ se:</p>
+        <ol>
+          <li>Nenhum nó em $Z$ é descendente causal de $D$.</li>
+          <li>$Z$ bloqueia todos os caminhos entre $D$ e $Y$ que contêm uma seta apontando para $D$ (caminhos backdoor).</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. O Double / Debiased Machine Learning (DML) de Chernozhukov</h2>
+      <p>A publicação revolucionária de <strong>Victor Chernozhukov, Christian Hansen et al. (The Econometrics Journal, 2018)</strong> resolveu a maior armadilha do Machine Learning moderno em causalidade: <em>o viés de regularização</em>.</p>
+
+      <h3>Por Que Modelos Supervisionados Ingênuos Falham?</h3>
+      <p>Se você treinar um XGBoost, Random Forest ou Lasso com $Y = f(D, Z)$ e olhar a importância ou a derivada de $D$, o estimador é inconsistente e converge a uma taxa mais lenta que $\sqrt{n}$. Algoritmos de ML introduzem regularização deliberada para reduzir variância e evitar overfitting. No entanto, essa contração enviesa severamente o parâmetro causal de interesse $\theta$, tornando testes de hipótese ($p$-valores) e intervalos de confiança completamente inválidos.</p>
+
+      <h3>O Modelo de Regressão Parcialmente Linear (PLR)</h3>
+      <p>O <code>onco-causal</code> formula o problema como:</p>
+      $$Y = D \theta + g_0(Z) + U, \quad \mathbb{E}[U \mid D, Z] = 0$$
+      $$D = m_0(Z) + V, \quad \mathbb{E}[V \mid Z] = 0$$
+      <p>Onde:</p>
+      <ul>
+        <li>$Y$ é a Taxa Padronizada por Idade com Suavização Bayesiana ($\text{ASR}_{\text{EB}}$).</li>
+        <li>$D$ é o vetor de exposição ambiental defasado no tempo ($t-\text{lag}$).</li>
+        <li>$\theta$ é o parâmetro de interesse causal (efeito marginal de 1 unidade de exposição sobre os óbitos).</li>
+        <li>$g_0(Z) = \mathbb{E}[Y \mid Z]$ é a função <em>nuisance</em> de alta dimensão que mapeia a infraestrutura assistencial (CNES) e saneamento (SNIS).</li>
+        <li>$m_0(Z) = \mathbb{E}[D \mid Z]$ é a função <em>nuisance</em> que prevê onde a poluição se concentra geograficamente no país.</li>
+      </ul>
+
+      <h3>A Condição de Ortogonalização de Neyman</h3>
+      <p>Em um estimador ingênuo, pequenos erros na estimação das funções nuisance $\hat{g}$ e $\hat{m}$ propagam-se linearmente para o erro de $\hat{\theta}$. Chernozhukov utiliza o escore ortogonalizado de Neyman $\psi(W; \theta, \eta)$:</p>
+      $$\psi(W; \theta, \eta) = (Y - D\theta - g(Z)) \cdot (D - m(Z)) = (\tilde{Y} - \tilde{D}\theta) \cdot \tilde{D}$$
+      <p>A propriedade mágica de Neyman estabelece que a derivada de Gateaux do momento causal em relação aos parâmetros de perturbação das funções nuisance é identicamente nula:</p>
+      $$\left. \frac{\partial}{\partial \eta} \mathbb{E}[\psi(W; \theta_0, \eta)] \right|_{\eta = \eta_0} = 0$$
+      <p>Isso significa que o estimador causal $\hat{\theta}$ é <strong>insensível a erros de primeira ordem</strong> no aprendizado de máquina de $\hat{g}$ e $\hat{m}$. Desde que os modelos de ML convirjam a uma taxa modesta de $n^{-1/4}$, o estimador causal final $\hat{\theta}$ atinge convergência paramétrica ótima $\sqrt{n}$ e segue distribuição normal:</p>
+      $$\sqrt{n}(\hat{\theta} - \theta_0) \xrightarrow{d} \mathcal{N}(0, \sigma^2)$$
+
+      <h3>O Algoritmo de Cross-Fitting (Partição Dupla sem Vazamento)</h3>
+      <p>Para evitar que o sobreajuste de $\hat{g}$ e $\hat{m}$ contamine os resíduos, o DML executa <strong>Cross-Fitting K-Fold</strong>:</p>
+      <ol>
+        <li>O conjunto de dados de municípios é dividido em $K$ blocos espaciais disjuntos (Ottobacias).</li>
+        <li>Para cada dobra $k \in \{1, \dots, K\}$:
+          <ul>
+            <li>Treina-se $\hat{g}^{(-k)}$ e $\hat{m}^{(-k)}$ utilizando apenas as $K-1$ dobras restantes.</li>
+            <li>Calculam-se os resíduos fora da amostra na dobra retida $k$:
+              $$\tilde{Y}_i = Y_i - \hat{g}^{(-k)}(Z_i), \quad \tilde{D}_i = D_i - \hat{m}^{(-k)}(Z_i), \quad \forall i \in I_k$$
+            </li>
+          </ul>
+        </li>
+        <li>O estimador final $\hat{\theta}$ é obtido por mínimos quadrados ordinários diretos nos resíduos consolidados:
+          $$\hat{\theta} = \left( \frac{1}{N} \sum_{i=1}^N \tilde{D}_i \tilde{D}_i' \right)^{-1} \left( \frac{1}{N} \sum_{i=1}^N \tilde{D}_i \tilde{Y}_i \right)$$
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>5. Testes Formais de Refutação Causal com DoWhy (Sharma & Kiciman)</h2>
+      <p>O framework <code>DoWhy</code> da Microsoft Research estabelece que nenhuma descoberta causal é válida sem passar por <strong>Testes de Refutação</strong> que tentam falsear o modelo:</p>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Teste de Refutação</th>
+            <th>Procedimento Algorítmico</th>
+            <th>Critério de Aprovação no onco-causal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Placebo Treatment Refuter</strong></td>
+            <td>Substitui o vetor real de agrotóxicos ou SISAGUA por ruído gaussiano pseudoaleatório $\mathcal{N}(0, 1)$ mantendo desfechos e controles intactos.</td>
+            <td>O novo efeito $\hat{\theta}_{\text{placebo}}$ deve colapsar para zero com $p > 0,05$. Se persistir significância, o DAG está incorreto.</td>
+          </tr>
+          <tr>
+            <td><strong>Random Common Cause Refuter</strong></td>
+            <td>Gera um confundidor sintético puramente aleatório e reexecuta toda a ortogonalização DML incluindo essa nova coluna no vetor $Z$.</td>
+            <td>A estimativa $\hat{\theta}$ original não deve oscilar além do seu intervalo de confiança de 95%.</td>
+          </tr>
+          <tr>
+            <td><strong>Data Subset Refuter</strong></td>
+            <td>Remove aleatoriamente 20% a 30% dos municípios ou bacias hidrográficas e reestima o modelo.</td>
+            <td>A média das estimativas amostrais deve permanecer estatisticamente indistinguível da estimativa de amostra completa.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Tratados de Engenharia e Ciência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

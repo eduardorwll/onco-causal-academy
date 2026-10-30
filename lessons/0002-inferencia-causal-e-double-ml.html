@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0002: Inferência Causal, DAGs e Double Machine Learning</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0002</span>
+    </div>
+    <span class="badge">Módulo 2: Causalidade & Econometria</span>
+    <h1>Lição 0002: Como o Double Machine Learning Purga o Viés de Detecção do SUS</h1>
+    <p>Aprenda a fundamentação teórica de DAGs, permutabilidade condicional e ortogonalização de Neyman com base em Cunningham, Hernán & Robins e Chernozhukov.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. O Paradoxo do Viés de Detecção Assistencial</h2>
+      <p>Em estudos ecológicos tradicionais de câncer no Brasil, quem roda uma regressão ingênua encontra um paradoxo bizarro: <em>municípios com mais saneamento básico e maior presença de hospitais CACON/UNACON aparentam ter <strong>mais</strong> câncer do que cidades rurais isoladas</em>.</p>
+
+      <p>Isso não ocorre porque hospitais causam câncer, mas sim porque <strong>hospitais diagnosticam e registram o câncer</strong>. Em municípios desprovidos de oncologia, os trabalhadores rurais morrem por 'causa mal definida' ou migram antes do registro. Se você não controlar essa distorção, qualquer modelo de machine learning atribuirá incorretamente o risco à infraestrutura médica.</p>
+    </section>
+
+    <section>
+      <h2>2. A Tríade Teórica da Causalidade</h2>
+
+      <h3>A. DAGs e o Critério da Porta dos Fundos (Scott Cunningham — <em>The Mixtape</em>)</h3>
+      <p>Scott Cunningham formaliza que um Grafo Acíclico Direcionado (DAG) exige distinguir três tipos de variáveis:</p>
+      <ul>
+        <li><strong>Confundidor ($Z$):</strong> Causa comum da exposição e do desfecho (ex.: renda e acesso hospitalar). <em>Deve ser bloqueado via Backdoor Criterion.</em></li>
+        <li><strong>Mediador ($M$):</strong> Variável intermediária no caminho causal ($D \to M \to Y$, ex.: mutação genética). <em>Não deve ser controlado se quisermos o efeito total!</em></li>
+        <li><strong>Colisor ($C$):</strong> Efeito comum de duas variáveis ($D \to C \leftarrow Y$). <em>Controlar por um colisor introduz viés de seleção imediato!</em></li>
+      </ul>
+
+      <h3>B. Permutabilidade Condicional (Hernán & Robins — <em>What If</em>)</h3>
+      <p>A escola de Harvard de Hernán & Robins demonstra que a causalidade exige <strong>Permutabilidade Condicional ($Exchangeability$)</strong>: condicional ao vetor $Z$ (saneamento do SNIS e leitos do CNES), o grupo de municípios expostos a agrotóxicos teria a mesma taxa basal de câncer do grupo não exposto caso a intervenção fosse suprimida: $Y^a \perp A \mid Z$.</p>
+
+      <h3>C. Double Machine Learning e Ortogonalização de Neyman (Chernozhukov et al.)</h3>
+      <p>Por que não basta colocar $Z$ direto em uma regressão linear ou Random Forest? Victor Chernozhukov (MIT) provou que estimadores de ML supervisionados sofrem de <strong>viés de regularização</strong>: ao tentar minimizar o erro global, eles contraem os coeficientes e destroem a inferência estatística ($\sqrt{n}$-consistência).</p>
+
+      <p>O <strong>Double Machine Learning (DML)</strong> resolve isso em dois estágios ortogonalizados:</p>
+      <ol>
+        <li>Treina um modelo de ML para prever o desfecho oncológico a partir dos controles: $\hat{g}(Z) = \mathbb{E}[Y \mid Z]$.</li>
+        <li>Treina outro modelo de ML para prever a exposição química a partir dos controles: $\hat{m}(Z) = \mathbb{E}[D \mid Z]$.</li>
+        <li>Calcula os resíduos de Neyman: $\tilde{Y} = Y - \hat{g}(Z)$ e $\tilde{D} = D - \hat{m}(Z)$.</li>
+        <li>Estima o efeito causal regredindo resíduo em resíduo: $\tilde{Y} = \theta \tilde{D} + \varepsilon$.</li>
+      </ol>
+      <p>Pelo Teorema de Frisch-Waugh-Lovell generalizado e pela condição de <strong>Neyman Orthogonality</strong>, a derivada do momento causal em relação aos erros de $\hat{g}$ e $\hat{m}$ é exatamente zero. Isso expurga o viés de diagnóstico e garante intervalos de confiança válidos!</p>
+
+      <div class="pitch-box">
+        <div class="pitch-title">🎙️ Resposta de 30 Segundos para a Banca</div>
+        <p>"Nós não confiamos em coeficientes ingênuos de regressão porque o viés de regularização de machine learning distorce p-valores. Seguindo Chernozhukov, aplicamos Double Machine Learning com cross-fitting: usamos ML apenas para aprender as funções auxiliares de leitos e saneamento do SUS, e depois os resíduos ortogonalizados de Neyman isolam o efeito causal líquido com intervalo de confiança assintoticamente normal."</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. O que acontece se controlarmos uma variável que é um COLISOR (Collider) entre o uso de agrotóxico e o câncer?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. Controlar colisor piora a estimativa.')">
+            O estimador torna-se perfeitamente não enviesado e atinge a máxima precisão estatística.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Exato! Abre-se um caminho espúrio que gera viés de seleção artificial.', '')">
+            Abre-se um caminho espúrio que distorce a relação causal e introduz viés de seleção artificial.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. Mediadores transmitem o efeito; colisores recebem setas.')">
+            O efeito total do tratamento é dividido igualmente entre o caminho direto e o indireto.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recurso Primário Recomendado</h2>
+      <p>Explore o Capítulo 3 de <strong>Scott Cunningham — <a href="https://mixtape.scunning.com/03-directed_acyclic_graphs" target="_blank">Causal Inference: The Mixtape</a></strong> para dominar as três estruturas fundamentais de DAGs (Chains, Forks e Colliders).</p>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <a href="0001-escopo-e-armadilhas-do-council.html">← Lição 0001 (Escopo & Council)</a>
+    <a href="0003-epidemiologia-espacial-e-bayesian-smoothing.html">Próxima: Lição 0003 (Epidemiologia Espacial & PySAL) →</a>
+  </footer>
+
+</body>
+</html>

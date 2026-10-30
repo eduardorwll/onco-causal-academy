@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 0006: Explicabilidade (XAI) e os Produtos de Impacto</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <a href="../index.html#licoes">Lições</a> &gt; <span>Lição 0006</span>
+    </div>
+    <span class="badge">Módulo 6: Explicabilidade & Produtos</span>
+    <h1>Lição 0006: XAI Axiomático (SHAP/ICE) e os Produtos Finais: Simulador Contrafactual e IDV</h1>
+    <p>Aprenda a fundamentação do TreeSHAP na Teoria dos Jogos e como traduzir coeficientes matemáticos em ferramentas de políticas públicas para o SUS e o Ministério Público.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Por Que o Machine Learning Tradicional Falha na Explicabilidade?</h2>
+      <p>Em modelos de árvores de decisão, as bibliotecas padrão frequentemente reportam a importância das variáveis através do <strong>ganho de impureza de Gini</strong> ou pela contagem de nós. Scott Lundberg provou na <em>Nature Machine Intelligence (2020)</em> que essas métricas são <strong>inconsistentes</strong>: se você tornar um modelo mais profundo ou adicionar atributos com alta cardinalidade, a métrica de Gini atribui importância espúria para variáveis irrelevantes.</p>
+
+      <p>A única solução matematicamente rigorosa é a abordagem dos <strong>Valores de Shapley (SHAP)</strong>, fundamentada na Teoria dos Jogos cooperativos de Lloyd Shapley (Prêmio Nobel):</p>
+      $$f(x) = \phi_0 + \sum_{j=1}^M \phi_j(x)$$
+      <ul>
+        <li><strong>Axioma da Eficiência:</strong> A soma das contribuições de cada poluente $\phi_j$ mais o valor base $\phi_0$ equivale exatamente à taxa total predita para o município. Não há "invenção de números".</li>
+        <li><strong>Axioma da Simetria:</strong> Se dois poluentes contribuem igualmente para o risco, recebem exatamente o mesmo valor SHAP.</li>
+        <li><strong>Axioma do Dummy:</strong> Variáveis que não alteram a predição recebem SHAP zero.</li>
+        <li><strong>Axioma da Aditividade:</strong> Garante que os efeitos possam ser somados entre subgrupos de risco.</li>
+      </ul>
+      <p>O algoritmo <strong>TreeSHAP</strong> calcula esses valores exatos em tempo polinomial $O(TLD^2)$, permitindo auditar os 5.570 municípios brasileiros em segundos!</p>
+    </section>
+
+    <section>
+      <h2>2. Curvas Dose-Resposta e Limiares de Transição ($\text{SHAP} = 0$)</h2>
+      <p>Seguindo Christoph Molnar (<em>Interpretable Machine Learning</em>), o onco-causal combina duas ferramentas visuais:</p>
+      <ul>
+        <li><strong>Partial Dependence Plots (PDP):</strong> Mostram o efeito marginal médio de um agrotóxico ou poluente atmosférico sobre a taxa de câncer no Brasil inteiro.</li>
+        <li><strong>Individual Conditional Expectation (ICE):</strong> Mostra uma linha por município, revelando se certos territórios mais vulneráveis (com déficit de saneamento) sofrem uma aceleração mais precoce do risco.</li>
+      </ul>
+      <p>Ao cruzar PDP e SHAP, encontramos o <strong>Limiar Crítico de Transição ($\text{SHAP} = 0$)</strong>: a dosagem exata a partir da qual o poluente ultrapassa a capacidade de depuração do organismo e passa a exercer contribuição marginal positiva na mortalidade por câncer. Isso fornece à ANVISA e ao Ministério do Meio Ambiente um parâmetro quantitativo para fixar limites legais de segurança.</p>
+    </section>
+
+    <section>
+      <h2>3. Os Dois Produtos de Impacto Social</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Produto 1: Simulador Contrafactual de Vidas Salvas (Para Prefeitos e Gestores do SUS)</div>
+        <p>Aplica derivadas parciais do DML para quantificar <strong>quantos óbitos por câncer seriam evitados por década em cada município</strong> sob três cenários regulatórios concretos:</p>
+        <ol>
+          <li><strong>Zonas de Amortecimento de 300 Metros:</strong> Restrição total de pulverização aérea ou por trator ao redor de perímetros urbanos e escolas.</li>
+          <li><strong>Cumprimento da Portaria GM/MS nº 888/2021:</strong> Descontaminação hídrica de trihalometanos, metais e pesticidas nas ETAs municipais.</li>
+          <li><strong>Redução de 1 IQR em $\text{PM}_{2.5}$:</strong> Desativação de queima de biomassa e filtragem de fontes industriais estacionárias.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Produto 2: Índice de Divergência de Vigilância (IDV) (Para o MPT e CEREST)</div>
+        <p>Razão algorítmica entre a incidência esperada pelo modelo físico-químico e a taxa oficialmente notificada no SINAN:</p>
+        $$\text{IDV}_i = \frac{\hat{Y}_i^{\text{Esperado pelo Modelo}}}{\text{Notificação Oficial no SINAN}_i + \varepsilon}$$
+        <p>Gera um mapa nacional de <strong>Silent Hotspots</strong>, fornecendo alvos cirúrgicos para que procuradores do trabalho e fiscais sanitários realizem busca ativa de casos omitidos pela vigilância passiva.</p>
+      </div>
+
+      <div class="pitch-box">
+        <div class="pitch-title">🎙️ Resposta de 30 Segundos para a Banca</div>
+        <p>"Não tratamos nossos modelos como caixas-pretas. Usamos TreeSHAP com respaldo axiomático da Teoria dos Jogos para identificar o ponto exato da curva dose-resposta onde o veneno vira câncer. E convertemos essa matemática em duas ferramentas cívicas: o Simulador Contrafactual, que mostra a prefeitos quantas mortes evitam criando faixas de proteção, e o IDV, um radar que indica ao Ministério Público onde o agronegócio ou a indústria estão adoecendo trabalhadores sem registrar no SINAN."</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Teste de Fixação Ativa</h2>
+      <div class="quiz-box">
+        <div class="quiz-question">
+          1. O que representa um valor de SHAP igual a zero ($\text{SHAP} = 0$) em uma curva dose-resposta de contaminação hídrica?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. SHAP zero é o ponto neutro em relação à predição média basal.')">
+            A garantia absoluta de que a água analisada no município está 100% pura e isenta de qualquer resíduo.
+          </div>
+          <div class="quiz-option" data-correct="true" onclick="handleQuiz(this, true, 'Correto! É o limiar de transição onde o contaminante passa a aumentar a mortalidade.', '')">
+            O limiar de transição onde a concentração química deixa de ser neutra e passa a adicionar risco oncológico.
+          </div>
+          <div class="quiz-option" onclick="handleQuiz(this, false, '', 'Incorreto. O valor predito não se torna nulo quando SHAP é zero.')">
+            O valor onde o algoritmo comete erro máximo e a taxa predita de mortalidade colapsa para zero.
+          </div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recurso Primário Recomendado</h2>
+      <p>Consulte o Capítulo 9 de <strong>Christoph Molnar — <a href="https://christophm.github.io/interpretable-ml-book/shap.html" target="_blank">Interpretable Machine Learning</a></strong> para entender a dedução dos quatro axiomas de Shapley.</p>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <a href="0005-estado-da-arte-agrotoxicos-e-cancer.html">← Lição 0005 (Literatura de Agrotóxicos)</a>
+    <a href="../index.html">Voltar ao Portal de Aprendizado →</a>
+  </footer>
+
+</body>
+</html>

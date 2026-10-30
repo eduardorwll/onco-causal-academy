@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratado Técnico: TabFM, TabPFN e Deep Learning Tabular — onco-causal</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <a href="../index.html">Portal de Aprendizado</a> &gt; <span>Tratados Técnicos Aprofundados</span>
+    </div>
+    <h1>Tratado Técnico: Tabular Foundation Models, PFNs e o Debate GBDT vs. Deep Learning</h1>
+    <p>Fundamentação teórica, viés indutivo e arquiteturas computacionais baseadas em Frank Hutter, Léo Grinsztajn, Gaël Varoquaux, Sercan Arik e Tomas Pfister.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Por Que Modelos de Árvores Dominaram Tabelas? (Grinsztajn et al., NeurIPS 2022)</h2>
+      <p>Enquanto a visão computacional e o processamento de texto foram completamente absorvidos por redes neurais profundas, os dados tabulares estruturados permaneceram como o último reduto dominado por <strong>Gradient Boosted Decision Trees (GBDTs: XGBoost, LightGBM, CatBoost)</strong>.</p>
+
+      <p>No estudo referencial <em>"Why Do Tree-Based Models Still Outperform Deep Learning on Tabular Data?"</em> (NeurIPS, 2022), <strong>Léo Grinsztajn, Edouard Oyallon e Gaël Varoquaux</strong> isolaram as três razões fundamentais dessa superioridade empírica:</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">1. Superfícies de Decisão Alinhadas aos Eixos (Axis-Aligned Boundaries)</div>
+        <p>Dados tabulares frequentemente contêm variáveis independentes com significados físicos distintos (ex.: litros de glifosato por hectare, número de mamógrafos por 100k hab., pH da água). A função de risco de câncer apresenta descontinuidades e limiares de corte toxicológicos. As árvores particionam o espaço ortogonalmente aos eixos coordenados ($x_j \le c$), adaptando-se com perfeição a funções em degrau sem exigir suavidade artificial.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">2. Invariância a Rotações vs. Invariância a Transformações Monotônicas</div>
+        <p>Redes neurais baseadas em camadas densas (MLP) são <em>invariantes a rotações</em> nos atributos: girar a matriz de features não altera a capacidade representacional da rede. No entanto, dados tabulares <strong>não</strong> são invariantes a rotação: somar $2 \times \text{leitos} + 3 \times \text{arsênio}$ cria uma variável combinada sem significado biofísico. Em contraste, GBDTs são <em>invariantes a transformações monotônicas</em> individuais de cada coluna: aplicar logaritmo, raiz quadrada ou reescalonamento não altera nenhuma decisão de divisão da árvore.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">3. Resistência Imunológica a Atributos Ruído (Sparsity of Information)</div>
+        <p>Em matrizes com centenas de covariáveis municipais, a maioria das colunas contém pouco ou nenhum sinal para um determinado subtipo de câncer. GBDTs simplesmente ignoram essas variáveis, atribuindo-lhes zero splits. Redes neurais tradicionais sofrem para anular os pesos de conexões densas, sobreajustando o ruído.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. O Paradigma das Prior-Data Fitted Networks (PFNs / TabPFN)</h2>
+      <p>A ruptura com os limites do Deep Learning tradicional em tabelas ocorreu com a introdução das <strong>Prior-Data Fitted Networks (PFNs)</strong> por <strong>Müller, Hollmann, Eggensperger e Frank Hutter (NeurIPS 2021, ICLR 2023, Nature 2024)</strong>.</p>
+
+      <h3>Como as PFNs Redefinem o Treinamento?</h3>
+      <p>Em qualquer algoritmo clássico (seja XGBoost ou MLP), o modelo é treinado nos dados do problema através de otimização de parâmetros por gradiente descendente. Em PFNs, o processo é radicalmente diferente:</p>
+      <ol>
+        <li><strong>Fase Offline (Meta-Treinamento Prévio):</strong> A rede Transformer é treinada em milhões de conjuntos de dados sintéticos gerados aleatoriamente por um gerador causal a priori $\mathcal{P}$. Esse gerador sintetiza grafos causais estruturais (SCMs), árvores de decisão aleatórias, processos gaussianos e redes bayesianas.</li>
+        <li><strong>Aproximação da Inferência Bayesiana:</strong> O objetivo de treinamento minimiza a perda de entropia cruzada em prever a distribuição preditiva posterior exata:
+          $$\mathcal{L}_{\text{PFN}}(\theta) = - \mathbb{E}_{\mathcal{D} \sim \mathcal{P}} \left[ \sum_{i=1}^n \log q_\theta(y_i \mid x_i, \mathcal{D}_{<i}) \right]$$
+          Onde $q_\theta$ aproxima a integral bayesiana analítica:
+          $$p(y_{\text{query}} \mid x_{\text{query}}, \mathcal{D}_{\text{suporte}}) = \int p(y_{\text{query}} \mid x_{\text{query}}, w) p(w \mid \mathcal{D}_{\text{suporte}}) \, dw$$
+        </li>
+        <li><strong>Fase Online (In-Context Learning sem Backpropagation):</strong> Quando fornecemos os dados dos municípios brasileiros, a rede <strong>não executa nenhum gradiente</strong>. O histórico de municípios entra como conjunto de suporte e a predição para o novo município é computada em uma única passagem direta (*single forward pass*), operando em menos de 1 segundo!</li>
+      </ol>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Por Que o TabFM é Ideal para Municípios Rurais?</div>
+        <p>O TabFM não sofre do problema de superajuste em pequenos volumes de dados. Como sua arquitetura emula um estimador Bayesiano rigoroso com prior causal embutido, ele mantém calibração probabilística perfeita mesmo ao avaliar municípios com histórico amostral reduzido.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Arquitetura do TabFM: Learned Fourier Cell Embeddings</h2>
+      <p>Um dos maiores desafios de Transformers em tabelas reside na tokenização de números reais contínuos (ex.: $3.452,8$ litros de agrotóxico ou $14,2 \, \mu\text{g/m}^3$ de $\text{PM}_{2.5}$). Normalizações lineares ingênuas ou one-hot encodings perdem a geometria numérica.</p>
+
+      <p>O <code>TabFM</code> implementa <strong>Learned Fourier Cell Embeddings</strong>:</p>
+      $$e(x_{ij}) = W_{\text{out}} \left[ \cos(2\pi \cdot W_{\text{freq}} x_{ij} + b) \,\|\, \sin(2\pi \cdot W_{\text{freq}} x_{ij} + b) \right]$$
+      
+      <p>Onde as frequências harmônicas $W_{\text{freq}}$ são ajustadas para capturar múltiplos comprimentos de onda da função de resposta biológica:</p>
+      <ul>
+        <li>Frequências baixas capturam tendências macroscópicas globais (efeito de gradiente regional).</li>
+        <li>Frequências altas capturam descontinuidades abruptas e transições de fase locais (excedência de limites toxicológicos).</li>
+      </ul>
+
+      <p>Esses embeddings de célula são processados por <strong>24 camadas de atenção bidimensional alternada (Dual-Axial Attention)</strong>: blocos de atenção que operam alternadamente entre atributos (colunas) e entre municípios (linhas), aprendendo a correlação de múltiplos poluentes no espaço.</p>
+    </section>
+
+    <section>
+      <h2>4. TabNet: Atenção Sequencial e Seleção Esparsa (Arik & Pfister)</h2>
+      <p>O terceiro pilar do benchmark do <code>onco-causal</code> é o <strong>TabNet (Google Cloud AI, AAAI 2021)</strong>, que introduziu o mecanismo de seleção de atributos por atenção sequencial:</p>
+
+      <p>Em cada etapa de decisão $s \in \{1, \dots, S\}$:</p>
+      <ol>
+        <li>O modelo gera uma máscara de atenção esparsa $M[s] \in \mathbb{R}^B \times D$ utilizando a função <strong>Sparsemax</strong> ou <strong>Entmax</strong>, que força pesos irrelevantes a serem exatamente zero (esparsidade verdadeira):
+          $$M[s] = \text{Sparsemax}(V_s(a[s-1]))$$
+        </li>
+        <li>Apenas as variáveis selecionadas pela máscara participam da camada de processamento de atributos (GLU — Gated Linear Unit).</li>
+        <li>O TabNet acumula as máscaras ao longo das etapas, fornecendo <strong>Instance-wise Feature Selection</strong>: para cada município específico, ele explicita exatamente qual percentual da decisão foi atribuído aos agrotóxicos da lavoura vs. aos metais pesados da água de abastecimento.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Tratados de Engenharia e Ciência</span>
+    <a href="../index.html">← Voltar ao Portal</a>
+  </footer>
+
+</body>
+</html>

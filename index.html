@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Aprendizado Técnico & Defesa — onco-causal</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    @media (min-width: 700px) {
+      .portal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .module-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.4rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .module-card:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+    .module-card h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.15rem;
+    }
+    .module-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .module-card .meta {
+      font-size: 0.8rem;
+      font-family: var(--font-sans);
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+    .sim-container {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .sim-slider {
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .sim-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .sim-stat {
+      background: var(--accent-light);
+      padding: 1rem;
+      border-radius: 6px;
+    }
+    .sim-stat-val {
+      font-family: var(--font-sans);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent-color);
+    }
+    .sim-stat-lbl {
+      font-size: 0.8rem;
+      font-family: var(--font-sans);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .treatise-card {
+      border-left: 4px solid var(--accent-color);
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.2rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      transition: all 0.15s ease;
+    }
+    .treatise-card:hover {
+      border-left-width: 6px;
+      background: var(--accent-light);
+    }
+    .treatise-card h4 {
+      margin: 0 0 0.4rem 0;
+      font-size: 1.1rem;
+    }
+    .treatise-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="nav-breadcrumbs">
+      <span>onco-causal</span> &gt; <strong>Academia de Aprendizado & Treinamento Técnico</strong>
+    </div>
+    <h1>Portal de Aprendizado e Domínio Técnico: onco-causal</h1>
+    <p>Base de conhecimento curricular completa, roteiros de defesa oral, tratados matemáticos detalhados e literatura científica exaustiva estruturada para o <strong>AI4Good (Brazil Conference 2027 at Harvard & MIT)</strong>.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Diretrizes da Missão e Diagnóstico do LLM Council</h2>
+      <p>Nosso objetivo é garantir que toda a equipe domine não apenas a nomenclatura, mas <strong>o funcionamento matemático e empírico de cada engrenagem da nossa stack</strong>, blindando a apresentação contra as armadilhas identificadas pelo conselho de modelos:</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">⚠️ As 4 Regras de Ouro da Apresentação</div>
+        <ol>
+          <li><strong>Zero Hermetismo na Abertura:</strong> Comece o pitch pela dor humana no SUS e vidas salvas, nunca por termos abstratos.</li>
+          <li><strong>Mostre a Ferramenta Funcionando:</strong> O Simulador Contrafactual visual deve ser exibido nos primeiros 90 segundos.</li>
+          <li><strong>Citação de Autoridade:</strong> Em perguntas difíceis, responda citando os autores canônicos (Chernozhukov, Hernán, Cunningham, Waller & Gotway, Hutter, Lundberg).</li>
+          <li><strong>Sinergia de Equipe:</strong> Demonstre a complementariedade entre Epidemiologia, Inteligência Artificial e Engenharia Cívica.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Mini Protótipo do Simulador Contrafactual -->
+    <section>
+      <h2>Prévia Interativa: O Simulador Contrafactual de Vidas Salvas</h2>
+      <p>Teste o protótipo conceitual da ferramenta desenvolvida para secretários municipais de saúde e prefeitos:</p>
+
+      <div class="sim-container">
+        <h3>Município Piloto: Sorriso (Mato Grosso) — População: 110.607 hab.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Ajuste a faixa de proteção sem pulverização de agrotóxicos ao redor da zona urbana e escolas:</p>
+        
+        <input type="range" min="0" max="1000" step="50" value="300" class="sim-slider" id="bufferRange" oninput="updateSim(this.value)">
+        <div style="display: flex; justify-content: space-between; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600;">
+          <span>0m (Cenário Atual)</span>
+          <span id="bufferVal" style="color: var(--accent-color); font-size: 1.1rem;">300 metros</span>
+          <span>1.000m (Faixa Ampla)</span>
+        </div>
+
+        <div class="sim-metrics">
+          <div class="sim-stat">
+            <div class="sim-stat-val" id="vidasSalvas">18</div>
+            <div class="sim-stat-lbl">Óbitos por Câncer Evitados / Década</div>
+          </div>
+          <div class="sim-stat">
+            <div class="sim-stat-val" id="reducaoLeucemia">-19.4%</div>
+            <div class="sim-stat-lbl">Redução em Leucemias e Linfomas Infantis</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Tratados Técnicos Aprofundados (NOVIDADE) -->
+    <section>
+      <h2>Tratados Técnicos Aprofundados (Fundamentação Explicada das Fontes)</h2>
+      <p>Documentos de alta densidade técnica com deduções matemáticas, fórmulas, diagramas e análise crítica de cada fonte bibliográfica mapeada:</p>
+
+      <div class="treatise-card">
+        <h4><a href="reference/guia-teorico-inferencia-causal.html">1. Tratado Técnico: Inferência Causal, DAGs e Double Machine Learning</a></h4>
+        <p>A teoria dos desfechos potenciais de Rubin/Neyman, permutabilidade condicional de Hernán & Robins, regras de DAGs e colisores de Cunningham, a prova matemática do escore ortogonalizado de Neyman de Chernozhukov e os 3 testes de refutação do DoWhy.</p>
+      </div>
+
+      <div class="treatise-card">
+        <h4><a href="reference/guia-teorico-geoespacial-bayesian.html">2. Tratado Técnico: Epidemiologia Espacial e Suavização Bayesiana Empírica</a></h4>
+        <p>Padronização direta (ASR OMS) vs indireta (SMR), o problema dos pequenos números, dedução matemática do encolhimento (shrinkage) do Spatial Linear Empirical Bayes (k=31) de Waller & Gotway/Anselin e prevenção de vazamento via Spatial Block CV em Ottobacias (Roberts et al.).</p>
+      </div>
+
+      <div class="treatise-card">
+        <h4><a href="reference/guia-teorico-modelos-tabulares.html">3. Tratado Técnico: Tabular Foundation Models (TabFM/TabPFN) vs. GBDTs</a></h4>
+        <p>O estudo de Grinsztajn et al. (NeurIPS 2022) provando a força das árvores, o paradigma das Prior-Data Fitted Networks (PFNs) de Frank Hutter (inferência bayesiana em um único forward pass), Fourier Cell Embeddings e atenção sequencial do TabNet.</p>
+      </div>
+
+      <div class="treatise-card">
+        <h4><a href="reference/guia-teorico-toxicologia-agrotoxicos-cancer.html">4. Tratado Técnico: Fisiopatologia da Carcinogênese, Quatro Vetores e Latência</a></h4>
+        <p>Fisiopatologia da iniciação, promoção e progressão, a bifurcação estrita de lags (t-2..5 anos para hematológicos e t-10..25 anos para tumores sólidos), método de lavouras de Pignati, parâmetros do SISAGUA (Portaria 888/2021), LINACH e o apagão de notificações do SINAN.</p>
+      </div>
+
+      <div class="treatise-card">
+        <h4><a href="reference/guia-teorico-xai-e-produtos.html">5. Tratado Técnico: XAI Axiomático, Simulador Contrafactual e o IDV</a></h4>
+        <p>Os quatro axiomas de Lloyd Shapley (Eficiência, Simetria, Dummy, Aditividade), o algoritmo TreeSHAP em tempo polinomial O(TLD²) de Scott Lundberg, curvas dose-resposta PDP/ICE com limiares SHAP=0, e as equações matemáticas do Simulador Contrafactual e do IDV.</p>
+      </div>
+    </section>
+
+    <!-- Grade de Lições -->
+    <section id="licoes">
+      <h2>Currículo de Lições Estruturadas com Quizzes Ativos</h2>
+      <div class="portal-grid">
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0001</span>
+            <h3><a href="lessons/0001-escopo-e-armadilhas-do-council.html">Escopo e as Armadilhas do Council</a></h3>
+            <p>Diagnóstico completo do conselho de modelos, neutralização do hermetismo acadêmico e as regras do edital AI4Good.</p>
+          </div>
+          <div class="meta">Tempo: 10 min · Fundamentos & Estratégia</div>
+        </div>
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0002</span>
+            <h3><a href="lessons/0002-inferencia-causal-e-double-ml.html">Inferência Causal & Double ML</a></h3>
+            <p>DAGs de Cunningham, permutabilidade condicional de Hernán & Robins e ortogonalização de Neyman de Chernozhukov.</p>
+          </div>
+          <div class="meta">Tempo: 15 min · Econometria & Causalidade</div>
+        </div>
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0003</span>
+            <h3><a href="lessons/0003-epidemiologia-espacial-e-bayesian-smoothing.html">Epidemiologia Espacial & PySAL</a></h3>
+            <p>O problema dos pequenos números, Spatial Empirical Bayes (k=31) de Waller & Gotway e Spatial Block CV em Ottobacias.</p>
+          </div>
+          <div class="meta">Tempo: 15 min · Geoespacial & Pequenas Áreas</div>
+        </div>
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0004</span>
+            <h3><a href="lessons/0004-tabfm-vs-gbdt-prior-data-fitted-networks.html">TabFM vs. GBDT (Prior-Data Fitted Networks)</a></h3>
+            <p>A revolução das PFNs de Frank Hutter, Fourier Cell Embeddings e por que árvores continuam fortes (Grinsztajn et al.).</p>
+          </div>
+          <div class="meta">Tempo: 15 min · Machine Learning Tabular</div>
+        </div>
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0005</span>
+            <h3><a href="lessons/0005-estado-da-arte-agrotoxicos-e-cancer.html">Estado da Arte de Agrotóxicos</a></h3>
+            <p>Revisão exaustiva de Pignati, Panis, Bombardi, Dutra e Dominici (Harvard), comprovando o ineditismo do Onco-Causal.</p>
+          </div>
+          <div class="meta">Tempo: 15 min · Literatura Científica</div>
+        </div>
+
+        <div class="module-card">
+          <div>
+            <span class="badge">Lição 0006</span>
+            <h3><a href="lessons/0006-xai-simulador-contrafactual-e-idv.html">XAI e os Produtos de Impacto</a></h3>
+            <p>Fundamentação axiomática do TreeSHAP, limiares dose-resposta (SHAP=0), o Simulador Contrafactual e o radar do IDV.</p>
+          </div>
+          <div class="meta">Tempo: 15 min · Produtos Cívicos & XAI</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Seção de Referência Rápida e Governança -->
+    <section>
+      <h2>Documentos Canônicos e Sínteses Rápidas</h2>
+      <ul>
+        <li><a href="reference/cheat-sheet-banca.html"><strong>Cheat Sheet de Defesa Técnica Oral:</strong></a> Tabela de respostas rápidas de 30 segundos para as perguntas mais provocativas de bancas examinadoras.</li>
+        <li><a href="reference/comparativo-metodologico.html"><strong>Matriz Comparativa do Estado da Arte:</strong></a> Tabela completa com links e DOIs confrontando estudos brasileiros e internacionais com o Onco-Causal.</li>
+        <li><a href="GLOSSARY.md"><strong>GLOSSARY.md:</strong></a> Dicionário terminológico canônico com termos obrigatórios e termos a evitar.</li>
+        <li><a href="RESOURCES.md"><strong>RESOURCES.md:</strong></a> Curadoria anotada dos livros abertos e artigos científicos de maior impacto da área.</li>
+        <li><a href="MISSION.md"><strong>MISSION.md:</strong></a> Declaração formal de missão, restrições e critérios de sucesso da preparação.</li>
+        <li><a href="learning-records/0001-council-critique-and-failure-modes.md"><strong>Learning Record 0001:</strong></a> Registro de lição aprendida com as deliberações críticas do LLM Council.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="lesson-footer">
+    <span>onco-causal · Portal de Aprendizado e Governança</span>
+    <span>Edital AI4Good · Brazil Conference 2027</span>
+  </footer>
+
+  <script>
+    function updateSim(val) {
+      document.getElementById('bufferVal').textContent = val + ' metros';
+      const vidas = Math.round((val / 1000) * 36 * (1 - Math.exp(-val / 250)));
+      const reducao = ((val / 1000) * 38.8 * (1 - Math.exp(-val / 300))).toFixed(1);
+      document.getElementById('vidasSalvas').textContent = vidas;
+      document.getElementById('reducaoLeucemia').textContent = '-' + reducao + '%';
+    }
+  </script>
+
+</body>
+</html>
